@@ -1,0 +1,36 @@
+{
+  "name": "@shuriken-trade/sdk",
+  "version": "0.1.0",
+  "description": "TypeScript SDK for the Shuriken API (REST + WebSocket)",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "pusher-js": "^8.4.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.5",
+    "vitest": "^3.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ShurikenTrade/shuriken-sdk-ts.git"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}
