@@ -44,7 +44,7 @@ client.ws.subscribe('svm.token.swaps', { tokenAddress: 'So1111...' }, (event) =>
 
 ## Authentication
 
-Get an API key from your [Shuriken dashboard](https://shuriken.trade). The SDK uses agent keys (`sk_...`) for authentication.
+Get an API key from the [Shuriken Agents dashboard](https://app.shuriken.trade/agents). The SDK uses agent keys (`sk_...`) for authentication.
 
 ## License
 
