@@ -1,6 +1,6 @@
 # @shuriken-trade/sdk
 
-TypeScript SDK for the [Shuriken](https://shuriken.trade) API.
+TypeScript SDK for the [Shuriken](https://app.shuriken.trade) API.
 
 > **Status:** Early development — API surface may change.
 
