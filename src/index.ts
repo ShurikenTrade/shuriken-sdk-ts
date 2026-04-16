@@ -28,6 +28,21 @@ export {
   ShurikenSessionError,
 } from './errors.js'
 
+// Portfolio API types
+export type {
+  GetBalancesParams,
+  GetHistoryParams,
+  GetPnlParams,
+  GetPositionsParams,
+  PortfolioApi,
+  PortfolioHistoryPoint,
+  PortfolioPnl,
+  PortfolioTrade,
+  PositionInfo,
+  PositionsResponse,
+  WalletBalance,
+} from './api/portfolio.js'
+
 // Swap API types
 export type {
   ApproveAllowanceResponse,

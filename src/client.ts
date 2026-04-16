@@ -3,6 +3,13 @@ import Pusher from 'pusher-js'
 import { ShurikenApiError, ShurikenAuthError, ShurikenSessionError } from './errors.js'
 import type { StreamFilterMap, StreamId, StreamPayloadMap } from './streams/index.js'
 import type {
+  PortfolioApi,
+  PortfolioPnl,
+  PortfolioTrade,
+  PositionsResponse,
+  WalletBalance,
+} from './api/portfolio.js'
+import type {
   ApproveAllowanceResponse,
   ApproveSpenderResponse,
   BuildTransactionResponse,
@@ -50,6 +57,7 @@ import type {
  * ```
  */
 export interface ShurikenClient {
+  portfolio: PortfolioApi
   swap: SwapApi
   tokens: TokensApi
   ws: {
@@ -163,6 +171,34 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
 
     getPools: (tokenId) =>
       apiGet<TokenPools>(`/api/v2/tokens/${encodeURIComponent(tokenId)}/pools`),
+  }
+
+  // ─── Portfolio ─────────────────────────────────────────────────────────
+
+  const portfolio: PortfolioApi = {
+    getBalances: (params) => {
+      const qs = buildQuery({ chain: params?.chain })
+      return apiGet<{ wallets: WalletBalance[] }>(`/api/v2/portfolio/balances${qs}`).then(
+        (data) => data.wallets
+      )
+    },
+
+    getHistory: (params) => {
+      const qs = buildQuery({ chain: params?.chain, page: params?.page, limit: params?.limit })
+      return apiGet<{ trades: PortfolioTrade[] }>(`/api/v2/portfolio/history${qs}`).then(
+        (data) => data.trades
+      )
+    },
+
+    getPnl: (params) => {
+      const qs = buildQuery({ timeframe: params?.timeframe })
+      return apiGet<PortfolioPnl>(`/api/v2/portfolio/pnl${qs}`)
+    },
+
+    getPositions: (params) => {
+      const qs = buildQuery({ chain: params?.chain, status: params?.status })
+      return apiGet<PositionsResponse>(`/api/v2/portfolio/positions${qs}`)
+    },
   }
 
   // ─── Swap ──────────────────────────────────────────────────────────────
@@ -495,6 +531,7 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
   // ─── Client ────────────────────────────────────────────────────────────
 
   return {
+    portfolio,
     swap,
     tokens,
     ws: {
