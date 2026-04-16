@@ -3,6 +3,13 @@ import Pusher from 'pusher-js'
 import { ShurikenApiError, ShurikenAuthError, ShurikenSessionError } from './errors.js'
 import type { StreamFilterMap, StreamId, StreamPayloadMap } from './streams/index.js'
 import type {
+  AccountApi,
+  AccountInfo,
+  AccountSettings,
+  AccountUsage,
+  AccountWallet,
+} from './api/account.js'
+import type {
   PortfolioApi,
   PortfolioPnl,
   PortfolioTrade,
@@ -57,6 +64,7 @@ import type {
  * ```
  */
 export interface ShurikenClient {
+  account: AccountApi
   portfolio: PortfolioApi
   swap: SwapApi
   tokens: TokensApi
@@ -127,6 +135,31 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
     }
     const json = await res.json()
     return (json.data ?? json) as T
+  }
+
+  async function apiPut<T>(path: string, body: unknown): Promise<T> {
+    const res = await apiFetch(path, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+    if (res.status === 401) throw new ShurikenAuthError('Unauthorized')
+    if (!res.ok) {
+      const text = await res.text().catch(() => '')
+      throw new ShurikenApiError(`${res.status}: ${text}`, res.status)
+    }
+    const json = await res.json()
+    return (json.data ?? json) as T
+  }
+
+  // ─── Account ──────────────────────────────────────────────────────────
+
+  const account: AccountApi = {
+    getMe: () => apiGet<AccountInfo>('/api/v2/account/me'),
+    getSettings: () => apiGet<AccountSettings>('/api/v2/account/settings'),
+    updateSettings: (settings) => apiPut<AccountSettings>('/api/v2/account/settings', settings),
+    getUsage: () => apiGet<AccountUsage>('/api/v2/account/usage'),
+    getWallets: () => apiGet<AccountWallet[]>('/api/v2/account/wallets'),
   }
 
   // ─── Tokens ───────────────────────────────────────────────────────────
@@ -531,6 +564,7 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
   // ─── Client ────────────────────────────────────────────────────────────
 
   return {
+    account,
     portfolio,
     swap,
     tokens,

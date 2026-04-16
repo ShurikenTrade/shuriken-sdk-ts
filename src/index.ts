@@ -28,6 +28,24 @@ export {
   ShurikenSessionError,
 } from './errors.js'
 
+// Account API types
+export type {
+  AccountApi,
+  AccountInfo,
+  AccountSettings,
+  AccountUsage,
+  AccountWallet,
+  AgentKeyConstraints,
+  ChainPresets,
+  DefaultWallets,
+  EvmSwapPreset,
+  OneClickModeSettings,
+  SolanaSwapPreset,
+  SwapPreset,
+  TradeSettings,
+  WalletGroup,
+} from './api/account.js'
+
 // Portfolio API types
 export type {
   GetBalancesParams,
