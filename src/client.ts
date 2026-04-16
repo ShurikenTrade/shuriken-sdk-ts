@@ -115,13 +115,16 @@ interface ActiveSubscription {
   resolved: ResolvedSubscription | null
 }
 
+const DEFAULT_API_BASE_URL = 'https://api.shuriken.trade'
+
 export function createShurikenClient(options: ShurikenClientOptions): ShurikenClient {
+  const apiBaseUrl = options.apiBaseUrl ?? DEFAULT_API_BASE_URL
   const authHeader = `Bearer ${options.apiKey}`
 
   // ─── Shared fetch helper ───────────────────────────────────────────────
 
   async function apiFetch(path: string, init?: RequestInit): Promise<Response> {
-    const url = `${options.apiBaseUrl}${path}`
+    const url = `${apiBaseUrl}${path}`
     return fetch(url, {
       ...init,
       headers: {
