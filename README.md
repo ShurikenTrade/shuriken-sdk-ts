@@ -61,6 +61,160 @@ const stats = await client.tokens.getStats('solana:So111...')
 const pools = await client.tokens.getPools('solana:So111...')
 ```
 
+## Swap
+
+```typescript
+// Get a quote
+const quote = await client.swap.getQuote({
+  chain: 'solana',
+  inputMint: 'So11111111111111111111111111111111111111112',
+  outputMint: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+  amount: '1000000000', // in base units (lamports)
+  slippageBps: 100,
+})
+
+// Managed execution (Shuriken signs & submits)
+const status = await client.swap.execute({
+  chain: 'solana',
+  inputMint: 'So111...',
+  outputMint: 'EPjF...',
+  amount: '1000000000',
+  walletId: 'w_123',
+})
+
+// Build unsigned transaction (for self-signing)
+const tx = await client.swap.buildTransaction({
+  chain: 'solana',
+  inputMint: 'So111...',
+  outputMint: 'EPjF...',
+  amount: '1000000000',
+  walletAddress: '7xKX...',
+})
+
+// Submit a signed transaction
+const submitted = await client.swap.submitTransaction({
+  chain: 'solana',
+  signedTransaction: 'base64...',
+  walletAddress: '7xKX...',
+})
+
+// Poll execution status
+const result = await client.swap.getStatus('task_id')
+
+// EVM approval helpers
+const spender = await client.swap.getApproveSpender(8453) // Base
+const allowance = await client.swap.getApproveAllowance({
+  chainId: 8453,
+  tokenAddress: '0xtoken...',
+  walletAddress: '0xwallet...',
+})
+```
+
+## Portfolio
+
+```typescript
+// Cross-chain balances
+const balances = await client.portfolio.getBalances({ chain: 'solana' })
+
+// Trade history
+const trades = await client.portfolio.getHistory({ chain: 'solana', limit: 50 })
+
+// PnL summary
+const pnl = await client.portfolio.getPnl({ timeframe: '7d' })
+
+// Open positions with PnL
+const positions = await client.portfolio.getPositions({ chain: 'solana' })
+```
+
+## Account
+
+```typescript
+// User profile
+const me = await client.account.getMe()
+
+// Wallets
+const wallets = await client.account.getWallets()
+
+// Agent key usage and constraints
+const usage = await client.account.getUsage()
+
+// Trade settings
+const settings = await client.account.getSettings()
+await client.account.updateSettings(settings)
+```
+
+## Trigger orders
+
+```typescript
+// Create a trigger order
+const order = await client.trigger.create({
+  chain: 'solana',
+  inputToken: 'So111...',
+  outputToken: 'EPjF...',
+  amount: '1000000000',
+  walletId: 'w_123',
+  triggerMetric: 'price_usd',
+  triggerDirection: 'above',
+  triggerValue: '0.001',
+})
+
+// List orders (cursor-paginated)
+const orders = await client.trigger.list({ limit: 50 })
+
+// Get order details
+const detail = await client.trigger.get('order_id')
+
+// Cancel
+await client.trigger.cancel('order_id')
+```
+
+## Perps
+
+```typescript
+// Markets
+const markets = await client.perps.getMarkets()
+const btc = await client.perps.getMarket('BTC')
+
+// Account state
+const account = await client.perps.getAccount()
+const fees = await client.perps.getFees()
+
+// Positions & orders
+const positions = await client.perps.getPositions()
+const openOrders = await client.perps.getOrders({ coin: 'BTC' })
+
+// Place an order
+const result = await client.perps.placeOrder({
+  walletId: 'w_123',
+  coin: 'BTC',
+  isBuy: true,
+  sz: '0.1',
+  limitPx: '60000',
+  orderType: 'limit',
+})
+
+// Modify / cancel
+await client.perps.modifyOrder({ walletId: 'w_123', coin: 'BTC', isBuy: true, sz: '0.2', limitPx: '61000', oid: 456, orderType: 'limit' })
+await client.perps.cancelOrder({ walletId: 'w_123', coin: 'BTC', oid: 456 })
+
+// Batch modify
+await client.perps.batchModifyOrders({
+  walletId: 'w_123',
+  modifications: [
+    { coin: 'BTC', isBuy: true, sz: '0.2', limitPx: '61000', oid: 456, orderType: 'limit' },
+  ],
+})
+
+// Close position / adjust margin / update leverage
+await client.perps.closePosition({ walletId: 'w_123', coin: 'BTC', percentage: 100 })
+await client.perps.updateMargin({ walletId: 'w_123', coin: 'BTC', amount: '500' })
+await client.perps.updateLeverage({ walletId: 'w_123', coin: 'BTC', leverage: 20, isCross: true })
+
+// History
+const fills = await client.perps.getFills({ startTime: Date.now() - 86400000 })
+const funding = await client.perps.getFunding({ startTime: Date.now() - 86400000 })
+```
+
 ## WebSocket streams
 
 | Stream | Filter | Description |
