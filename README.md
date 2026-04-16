@@ -1,6 +1,6 @@
-# @shuriken/sdk
+# @shuriken/sdk-ts
 
-[![npm](https://img.shields.io/npm/v/@shuriken/sdk)](https://www.npmjs.com/package/@shuriken/sdk)
+[![npm](https://img.shields.io/npm/v/@shuriken/sdk-ts)](https://www.npmjs.com/package/@shuriken/sdk-ts)
 
 TypeScript SDK for the [Shuriken](https://app.shuriken.trade) API.
 
@@ -9,13 +9,13 @@ TypeScript SDK for the [Shuriken](https://app.shuriken.trade) API.
 ## Install
 
 ```bash
-npm install @shuriken/sdk
+npm install @shuriken/sdk-ts
 ```
 
 ## Quick start
 
 ```typescript
-import { createShurikenClient } from '@shuriken/sdk'
+import { createShurikenClient } from '@shuriken/sdk-ts'
 
 const client = createShurikenClient({
   apiKey: process.env.SHURIKEN_API_KEY!,
