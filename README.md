@@ -16,7 +16,6 @@ npm install @shuriken-trade/sdk
 import { createShurikenClient } from '@shuriken-trade/sdk'
 
 const client = createShurikenClient({
-  apiBaseUrl: 'https://api.shuriken.trade',
   apiKey: process.env.SHURIKEN_API_KEY!,
 })
 
