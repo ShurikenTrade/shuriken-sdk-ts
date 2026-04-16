@@ -1,5 +1,7 @@
 # @shuriken/sdk
 
+[![npm](https://img.shields.io/npm/v/@shuriken/sdk)](https://www.npmjs.com/package/@shuriken/sdk)
+
 TypeScript SDK for the [Shuriken](https://app.shuriken.trade) API.
 
 > **Status:** Early development — API surface may change.
@@ -220,15 +222,18 @@ const funding = await client.perps.getFunding({ startTime: Date.now() - 86400000
 |--------|--------|-------------|
 | `svm.token.swaps` | `tokenAddress` | Solana token swap events |
 | `svm.token.poolInfo` | `tokenAddress` | Solana token/pool info updates |
-| `svm.wallet.nativeBalance` | `walletAddress` | SOL balance changes |
-| `svm.wallet.tokenBalance` | `tokenAddress` | SPL token balance changes |
+| `svm.token.balances` | `tokenAddress` | Token holder balance changes |
 | `svm.token.distributionStats` | `tokenAddress` | Token distribution analytics |
 | `svm.token.holderStats` | `tokenAddress` | Holder count analytics |
+| `svm.wallet.nativeBalance` | `walletAddress` | SOL balance changes |
+| `svm.wallet.tokenBalances` | `walletAddress` | SPL token balance changes |
 | `svm.bondingCurve.creations` | — | New bonding curve tokens |
 | `svm.bondingCurve.graduations` | — | Bonding curve graduations |
 | `evm.token.swaps` | `chainId`, `tokenAddress` | EVM token swap events |
 | `evm.token.poolInfo` | `chainId`, `tokenAddress` | EVM token/pool info updates |
-| `alpha.signalFeedGlobal` | — | Global signal feed |
+| `evm.token.balances` | `tokenAddress` | EVM token holder balance changes |
+| `evm.wallet.nativeBalance` | `walletAddress` | Native balance changes (ETH/BNB) |
+| `evm.wallet.tokenBalances` | `walletAddress` | ERC-20 token balance changes |
 
 ## Authentication
 
