@@ -101,6 +101,18 @@ export type {
   TokensApi,
 } from './api/tokens.js'
 
+// Trigger API types
+export type {
+  CancelledTriggerOrder,
+  CreateTriggerOrderParams,
+  ListTriggerOrdersParams,
+  TriggerApi,
+  TriggerCondition,
+  TriggerOrder,
+  TriggerOrderView,
+  TriggerOrdersResponse,
+} from './api/trigger.js'
+
 // Stream types — SVM
 export type {
   SvmBondingCurveCreationEvent,

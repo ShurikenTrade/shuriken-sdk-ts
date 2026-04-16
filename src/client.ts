@@ -10,6 +10,13 @@ import type {
   AccountWallet,
 } from './api/account.js'
 import type {
+  CancelledTriggerOrder,
+  TriggerApi,
+  TriggerOrder,
+  TriggerOrderView,
+  TriggerOrdersResponse,
+} from './api/trigger.js'
+import type {
   PortfolioApi,
   PortfolioPnl,
   PortfolioTrade,
@@ -68,6 +75,7 @@ export interface ShurikenClient {
   portfolio: PortfolioApi
   swap: SwapApi
   tokens: TokensApi
+  trigger: TriggerApi
   ws: {
     connect(): Promise<void>
     disconnect(): void
@@ -143,6 +151,17 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
     })
+    if (res.status === 401) throw new ShurikenAuthError('Unauthorized')
+    if (!res.ok) {
+      const text = await res.text().catch(() => '')
+      throw new ShurikenApiError(`${res.status}: ${text}`, res.status)
+    }
+    const json = await res.json()
+    return (json.data ?? json) as T
+  }
+
+  async function apiDelete<T>(path: string): Promise<T> {
+    const res = await apiFetch(path, { method: 'DELETE' })
     if (res.status === 401) throw new ShurikenAuthError('Unauthorized')
     if (!res.ok) {
       const text = await res.text().catch(() => '')
@@ -271,6 +290,23 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
       })
       return apiGet<ApproveAllowanceResponse>(`/api/v2/swap/approve/allowance${qs}`)
     },
+  }
+
+  // ─── Trigger ─────────────────────────────────────────────────────────
+
+  const trigger: TriggerApi = {
+    create: (params) => apiPost<TriggerOrder>('/api/v2/trigger/order', params),
+
+    get: (orderId) =>
+      apiGet<TriggerOrderView>(`/api/v2/trigger/order/${encodeURIComponent(orderId)}`),
+
+    list: (params) => {
+      const qs = buildQuery({ limit: params?.limit, cursor: params?.cursor })
+      return apiGet<TriggerOrdersResponse>(`/api/v2/trigger/orders${qs}`)
+    },
+
+    cancel: (orderId) =>
+      apiDelete<CancelledTriggerOrder>(`/api/v2/trigger/order/${encodeURIComponent(orderId)}`),
   }
 
   // ─── WebSocket internals ───────────────────────────────────────────────
@@ -568,6 +604,7 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
     portfolio,
     swap,
     tokens,
+    trigger,
     ws: {
       connect: wsConnect,
       disconnect: wsDisconnect,
