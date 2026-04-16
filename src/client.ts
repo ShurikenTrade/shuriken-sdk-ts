@@ -3,6 +3,15 @@ import Pusher from 'pusher-js'
 import { ShurikenApiError, ShurikenAuthError, ShurikenSessionError } from './errors.js'
 import type { StreamFilterMap, StreamId, StreamPayloadMap } from './streams/index.js'
 import type {
+  ApproveAllowanceResponse,
+  ApproveSpenderResponse,
+  BuildTransactionResponse,
+  SubmitTransactionResponse,
+  SwapApi,
+  SwapQuote,
+  SwapStatus,
+} from './api/swap.js'
+import type {
   BatchTokensResponse,
   TokenChart,
   TokenInfo,
@@ -41,6 +50,7 @@ import type {
  * ```
  */
 export interface ShurikenClient {
+  swap: SwapApi
   tokens: TokensApi
   ws: {
     connect(): Promise<void>
@@ -153,6 +163,45 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
 
     getPools: (tokenId) =>
       apiGet<TokenPools>(`/api/v2/tokens/${encodeURIComponent(tokenId)}/pools`),
+  }
+
+  // ─── Swap ──────────────────────────────────────────────────────────────
+
+  const swap: SwapApi = {
+    getQuote: (params) => {
+      const qs = buildQuery({
+        chain: params.chain,
+        inputMint: params.inputMint,
+        outputMint: params.outputMint,
+        amount: params.amount,
+        slippageBps: params.slippageBps,
+      })
+      return apiGet<SwapQuote>(`/api/v2/swap/quote${qs}`)
+    },
+
+    execute: (params) => apiPost<SwapStatus>('/api/v2/swap/execute', params),
+
+    buildTransaction: (params) =>
+      apiPost<BuildTransactionResponse>('/api/v2/swap/transaction', params),
+
+    submitTransaction: (params) =>
+      apiPost<SubmitTransactionResponse>('/api/v2/swap/submit', params),
+
+    getStatus: (taskId) => apiGet<SwapStatus>(`/api/v2/swap/status/${encodeURIComponent(taskId)}`),
+
+    getApproveSpender: (chainId) => {
+      const qs = buildQuery({ chainId })
+      return apiGet<ApproveSpenderResponse>(`/api/v2/swap/approve/spender${qs}`)
+    },
+
+    getApproveAllowance: (params) => {
+      const qs = buildQuery({
+        chainId: params.chainId,
+        tokenAddress: params.tokenAddress,
+        walletAddress: params.walletAddress,
+      })
+      return apiGet<ApproveAllowanceResponse>(`/api/v2/swap/approve/allowance${qs}`)
+    },
   }
 
   // ─── WebSocket internals ───────────────────────────────────────────────
@@ -446,6 +495,7 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
   // ─── Client ────────────────────────────────────────────────────────────
 
   return {
+    swap,
     tokens,
     ws: {
       connect: wsConnect,

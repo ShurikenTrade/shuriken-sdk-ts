@@ -28,6 +28,26 @@ export {
   ShurikenSessionError,
 } from './errors.js'
 
+// Swap API types
+export type {
+  ApproveAllowanceResponse,
+  ApproveSpenderResponse,
+  BuildTransactionParams,
+  BuildTransactionResponse,
+  EvmTransactionData,
+  ExecuteSwapParams,
+  GetApproveAllowanceParams,
+  GetSwapQuoteParams,
+  QuoteSummary,
+  SubmitTransactionParams,
+  SubmitTransactionResponse,
+  SwapApi,
+  SwapFees,
+  SwapQuote,
+  SwapRoute,
+  SwapStatus,
+} from './api/swap.js'
+
 // Tokens API types
 export type {
   BatchTokensParams,
