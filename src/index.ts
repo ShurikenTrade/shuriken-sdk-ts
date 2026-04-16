@@ -159,6 +159,7 @@ export type {
   SvmSwapFees,
   SvmTokenBalanceEvent,
   SvmTokenDistributionStatsEvent,
+  SvmWalletTokenBalanceEvent,
   SvmTokenFilter,
   SvmTokenPoolEvent,
   SvmWalletFilter,
@@ -166,9 +167,13 @@ export type {
 
 // Stream types — EVM
 export type {
+  EvmNativeBalanceEvent,
   EvmSwapEvent,
+  EvmTokenBalanceEvent,
   EvmTokenFilter,
   EvmTokenPoolEvent,
+  EvmWalletFilter,
+  EvmWalletTokenBalanceEvent,
 } from './streams/index.js'
 
 // Stream maps

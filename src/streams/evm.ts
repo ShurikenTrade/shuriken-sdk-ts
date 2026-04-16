@@ -41,9 +41,50 @@ export interface EvmTokenPoolEvent {
   network: string
 }
 
+// ── evm.wallet.nativeBalance ─────────────────────────────────────────────────
+
+export interface EvmNativeBalanceEvent {
+  owner: string
+  chainId: number
+  blockNumber: number
+  blockTime: number
+  balance: string
+  network: string
+}
+
+// ── evm.wallet.tokenBalances ─────────────────────────────────────────────────
+
+export interface EvmWalletTokenBalanceEvent {
+  tokenAddress: string
+  owner: string
+  chainId: number
+  blockNumber: number
+  blockTime: number
+  balance: string
+  decimals: number
+  network: string
+}
+
+// ── evm.token.balances ──────────────────────────────────────────────────────
+
+export interface EvmTokenBalanceEvent {
+  tokenAddress: string
+  owner: string
+  chainId: number
+  blockNumber: number
+  blockTime: number
+  balance: string
+  decimals: number
+  network: string
+}
+
 // ── EVM filter shapes ────────────────────────────────────────────────────────
 
 export interface EvmTokenFilter {
   chainId: string
   tokenAddress: string
+}
+
+export interface EvmWalletFilter {
+  walletAddress: string
 }

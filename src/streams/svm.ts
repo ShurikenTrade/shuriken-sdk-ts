@@ -66,7 +66,20 @@ export interface SvmNativeBalanceEvent {
   network: 'sol'
 }
 
-// ── svm.wallet.tokenBalance ──────────────────────────────────────────────────
+// ── svm.wallet.tokenBalances ─────────────────────────────────────────────────
+
+export interface SvmWalletTokenBalanceEvent {
+  mint: string
+  owner: string
+  slot: number
+  blockTime: number
+  decimals: number
+  preBalance: number
+  postBalance: number
+  network: 'sol'
+}
+
+// ── svm.token.balances ──────────────────────────────────────────────────────
 
 export interface SvmTokenBalanceEvent {
   mint: string
