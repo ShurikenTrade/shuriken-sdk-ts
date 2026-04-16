@@ -10,6 +10,19 @@ import type {
   AccountWallet,
 } from './api/account.js'
 import type {
+  FundingPayment,
+  LeverageResponse,
+  MarginResponse,
+  OpenOrder,
+  OrderResponse,
+  PerpAccountState,
+  PerpFill,
+  PerpMarket,
+  PerpPositionsResponse as PerpPositionsResp,
+  PerpsApi,
+  UserFees,
+} from './api/perps.js'
+import type {
   CancelledTriggerOrder,
   TriggerApi,
   TriggerOrder,
@@ -72,6 +85,7 @@ import type {
  */
 export interface ShurikenClient {
   account: AccountApi
+  perps: PerpsApi
   portfolio: PortfolioApi
   swap: SwapApi
   tokens: TokensApi
@@ -160,8 +174,28 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
     return (json.data ?? json) as T
   }
 
-  async function apiDelete<T>(path: string): Promise<T> {
-    const res = await apiFetch(path, { method: 'DELETE' })
+  async function apiDelete<T>(path: string, body?: unknown): Promise<T> {
+    const init: RequestInit = { method: 'DELETE' }
+    if (body !== undefined) {
+      init.headers = { 'Content-Type': 'application/json' }
+      init.body = JSON.stringify(body)
+    }
+    const res = await apiFetch(path, init)
+    if (res.status === 401) throw new ShurikenAuthError('Unauthorized')
+    if (!res.ok) {
+      const text = await res.text().catch(() => '')
+      throw new ShurikenApiError(`${res.status}: ${text}`, res.status)
+    }
+    const json = await res.json()
+    return (json.data ?? json) as T
+  }
+
+  async function apiPatch<T>(path: string, body: unknown): Promise<T> {
+    const res = await apiFetch(path, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
     if (res.status === 401) throw new ShurikenAuthError('Unauthorized')
     if (!res.ok) {
       const text = await res.text().catch(() => '')
@@ -307,6 +341,68 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
 
     cancel: (orderId) =>
       apiDelete<CancelledTriggerOrder>(`/api/v2/trigger/order/${encodeURIComponent(orderId)}`),
+  }
+
+  // ─── Perps ──────────────────────────────────────────────────────────────
+
+  const perps: PerpsApi = {
+    getAccount: (params) => {
+      const qs = buildQuery({ wallet_id: params?.walletId })
+      return apiGet<PerpAccountState>(`/api/v2/perp/account${qs}`)
+    },
+
+    getFees: (params) => {
+      const qs = buildQuery({ wallet_id: params?.walletId })
+      return apiGet<UserFees>(`/api/v2/perp/fees${qs}`)
+    },
+
+    getFills: (params) => {
+      const qs = buildQuery({
+        wallet_id: params.walletId,
+        start_time: params.startTime,
+        end_time: params.endTime,
+        coin: params.coin,
+      })
+      return apiGet<PerpFill[]>(`/api/v2/perp/fills${qs}`)
+    },
+
+    getFunding: (params) => {
+      const qs = buildQuery({
+        wallet_id: params.walletId,
+        start_time: params.startTime,
+        end_time: params.endTime,
+        coin: params.coin,
+      })
+      return apiGet<FundingPayment[]>(`/api/v2/perp/funding${qs}`)
+    },
+
+    getMarkets: () => apiGet<PerpMarket[]>('/api/v2/perp/markets'),
+
+    getMarket: (coin) => apiGet<PerpMarket>(`/api/v2/perp/markets/${encodeURIComponent(coin)}`),
+
+    getOrders: (params) => {
+      const qs = buildQuery({ wallet_id: params?.walletId, coin: params?.coin })
+      return apiGet<OpenOrder[]>(`/api/v2/perp/orders${qs}`)
+    },
+
+    getPositions: (params) => {
+      const qs = buildQuery({ wallet_id: params?.walletId })
+      return apiGet<PerpPositionsResp>(`/api/v2/perp/positions${qs}`)
+    },
+
+    placeOrder: (params) => apiPost<OrderResponse>('/api/v2/perp/order', params),
+
+    modifyOrder: (params) => apiPatch<OrderResponse>('/api/v2/perp/order', params),
+
+    cancelOrder: (params) => apiDelete<OrderResponse>('/api/v2/perp/order', params),
+
+    batchModifyOrders: (params) => apiPatch<OrderResponse>('/api/v2/perp/orders', params),
+
+    closePosition: (params) => apiPost<OrderResponse>('/api/v2/perp/position/close', params),
+
+    updateLeverage: (params) => apiPost<LeverageResponse>('/api/v2/perp/leverage', params),
+
+    updateMargin: (params) => apiPost<MarginResponse>('/api/v2/perp/position/margin', params),
   }
 
   // ─── WebSocket internals ───────────────────────────────────────────────
@@ -603,6 +699,7 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
     account,
     portfolio,
     swap,
+    perps,
     tokens,
     trigger,
     ws: {

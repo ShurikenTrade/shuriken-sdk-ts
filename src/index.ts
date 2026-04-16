@@ -46,6 +46,42 @@ export type {
   WalletGroup,
 } from './api/account.js'
 
+// Perps API types
+export type {
+  BatchModifyEntry,
+  BatchModifyParams,
+  BookLevel,
+  CancelOrderParams,
+  ClosePositionParams,
+  FundingPayment,
+  GetPerpAccountParams,
+  GetPerpFeesParams,
+  GetPerpFillsParams,
+  GetPerpFundingParams,
+  GetPerpOrdersParams,
+  GetPerpPositionsParams,
+  LeverageResponse,
+  MarginResponse,
+  MarketCtx,
+  MarketMeta,
+  ModifyOrderParams,
+  OpenOrder,
+  OrderResponse,
+  OrderResult,
+  PerpAccountState,
+  PerpFill,
+  PerpMarket,
+  PerpPosition,
+  PerpPositionsResponse,
+  PerpsApi,
+  PlaceOrderParams,
+  SpotBalance,
+  TpSlParams,
+  UpdateLeverageParams,
+  UpdateMarginParams,
+  UserFees,
+} from './api/perps.js'
+
 // Portfolio API types
 export type {
   GetBalancesParams,
