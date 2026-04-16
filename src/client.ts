@@ -1,7 +1,16 @@
 import Pusher from 'pusher-js'
 
-import { ShurikenAuthError, ShurikenSessionError } from './errors.js'
+import { ShurikenApiError, ShurikenAuthError, ShurikenSessionError } from './errors.js'
 import type { StreamFilterMap, StreamId, StreamPayloadMap } from './streams/index.js'
+import type {
+  BatchTokensResponse,
+  TokenChart,
+  TokenInfo,
+  TokenPools,
+  TokenPrice,
+  TokenStats,
+  TokensApi,
+} from './api/tokens.js'
 import type {
   ConnectionState,
   ConnectionStateHandler,
@@ -32,6 +41,7 @@ import type {
  * ```
  */
 export interface ShurikenClient {
+  tokens: TokensApi
   ws: {
     connect(): Promise<void>
     disconnect(): void
@@ -71,6 +81,78 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
         Authorization: authHeader,
       },
     })
+  }
+
+  // ─── JSON request helpers ───────────────────────────────────────────────
+
+  async function apiGet<T>(path: string): Promise<T> {
+    const res = await apiFetch(path)
+    if (res.status === 401) throw new ShurikenAuthError('Unauthorized')
+    if (!res.ok) {
+      const text = await res.text().catch(() => '')
+      throw new ShurikenApiError(`${res.status}: ${text}`, res.status)
+    }
+    const json = await res.json()
+    return (json.data ?? json) as T
+  }
+
+  async function apiPost<T>(path: string, body: unknown): Promise<T> {
+    const res = await apiFetch(path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    })
+    if (res.status === 401) throw new ShurikenAuthError('Unauthorized')
+    if (!res.ok) {
+      const text = await res.text().catch(() => '')
+      throw new ShurikenApiError(`${res.status}: ${text}`, res.status)
+    }
+    const json = await res.json()
+    return (json.data ?? json) as T
+  }
+
+  // ─── Tokens ───────────────────────────────────────────────────────────
+
+  function buildQuery(params: Record<string, string | number | undefined>): string {
+    const entries = Object.entries(params).filter(([, v]) => v !== undefined)
+    if (entries.length === 0) return ''
+    return `?${entries.map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`).join('&')}`
+  }
+
+  const tokens: TokensApi = {
+    get: (tokenId) => apiGet<TokenInfo>(`/api/v2/tokens/${encodeURIComponent(tokenId)}`),
+
+    search: (params) => {
+      const qs = buildQuery({
+        q: params.q,
+        chain: params.chain,
+        page: params.page,
+        limit: params.limit,
+      })
+      return apiGet<TokenInfo[]>(`/api/v2/tokens/search${qs}`).then((data) => {
+        // API wraps in { tokens: [...] }
+        return (data as unknown as { tokens: TokenInfo[] }).tokens ?? (data as TokenInfo[])
+      })
+    },
+
+    batch: (params) =>
+      apiPost<BatchTokensResponse>('/api/v2/tokens/batch', { tokens: params.tokens }),
+
+    getPrice: (tokenId) =>
+      apiGet<TokenPrice>(`/api/v2/tokens/${encodeURIComponent(tokenId)}/price`),
+
+    getChart: (params) => {
+      const qs = buildQuery({ resolution: params.resolution, count: params.count })
+      return apiGet<TokenChart>(
+        `/api/v2/tokens/${encodeURIComponent(params.tokenId)}/price/chart${qs}`
+      )
+    },
+
+    getStats: (tokenId) =>
+      apiGet<TokenStats>(`/api/v2/tokens/${encodeURIComponent(tokenId)}/stats`),
+
+    getPools: (tokenId) =>
+      apiGet<TokenPools>(`/api/v2/tokens/${encodeURIComponent(tokenId)}/pools`),
   }
 
   // ─── WebSocket internals ───────────────────────────────────────────────
@@ -364,6 +446,7 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
   // ─── Client ────────────────────────────────────────────────────────────
 
   return {
+    tokens,
     ws: {
       connect: wsConnect,
       disconnect: wsDisconnect,

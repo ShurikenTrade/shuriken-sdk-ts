@@ -1,0 +1,53 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "files": {
+    "include": ["**/*.ts", "**/*.json"],
+    "ignore": ["node_modules/", "dist/"],
+    "maxSize": 2000000
+  },
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": false,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "lineWidth": 100,
+    "attributePosition": "auto"
+  },
+  "organizeImports": {
+    "enabled": false
+  },
+  "linter": {
+    "ignore": ["dist/**", "node_modules/**"],
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "correctness": {
+        "noUnusedImports": {
+          "level": "error"
+        }
+      },
+      "style": {
+        "noParameterAssign": "warn",
+        "noNonNullAssertion": "warn"
+      },
+      "performance": {
+        "noAccumulatingSpread": "warn"
+      },
+      "suspicious": {
+        "noAssignInExpressions": "warn"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "quoteProperties": "asNeeded",
+      "trailingCommas": "es5",
+      "semicolons": "asNeeded",
+      "arrowParentheses": "always",
+      "bracketSpacing": true,
+      "quoteStyle": "single",
+      "attributePosition": "auto"
+    }
+  }
+}

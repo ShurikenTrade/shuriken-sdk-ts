@@ -22,6 +22,17 @@ export class ShurikenSessionError extends ShurikenError {
   }
 }
 
+export class ShurikenApiError extends ShurikenError {
+  constructor(
+    message: string,
+    public readonly status: number,
+    public readonly requestId?: string
+  ) {
+    super(message, 'API_ERROR')
+    this.name = 'ShurikenApiError'
+  }
+}
+
 export class ShurikenDecodeError extends ShurikenError {
   constructor(
     message: string,

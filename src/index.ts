@@ -21,11 +21,32 @@ export type {
 } from './types.js'
 
 export {
+  ShurikenApiError,
   ShurikenAuthError,
   ShurikenDecodeError,
   ShurikenError,
   ShurikenSessionError,
 } from './errors.js'
+
+// Tokens API types
+export type {
+  BatchTokensParams,
+  BatchTokensResponse,
+  GetTokenChartParams,
+  SearchTokensParams,
+  TokenChart,
+  TokenChartCandle,
+  TokenInfo,
+  TokenPool,
+  TokenPools,
+  TokenPrice,
+  TokenPriceChangeStats,
+  TokenStats,
+  TokenTxnStats,
+  TokenUniqueTradersStats,
+  TokenVolumeStats,
+  TokensApi,
+} from './api/tokens.js'
 
 // Stream types — SVM
 export type {
