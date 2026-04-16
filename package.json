@@ -1,5 +1,5 @@
 {
-  "name": "@shuriken-trade/sdk",
+  "name": "@shuriken/sdk",
   "version": "0.1.0",
   "description": "TypeScript SDK for the Shuriken API (REST + WebSocket)",
   "type": "module",
@@ -21,6 +21,7 @@
     "lint:fix": "biome check --write src/",
     "format": "biome format --write src/",
     "test": "vitest run",
+    "prepublishOnly": "npm run build",
     "test:watch": "vitest"
   },
   "dependencies": {

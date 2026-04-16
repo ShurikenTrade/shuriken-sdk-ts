@@ -1,4 +1,4 @@
-# @shuriken-trade/sdk
+# @shuriken/sdk
 
 TypeScript SDK for the [Shuriken](https://app.shuriken.trade) API.
 
@@ -7,13 +7,13 @@ TypeScript SDK for the [Shuriken](https://app.shuriken.trade) API.
 ## Install
 
 ```bash
-npm install @shuriken-trade/sdk
+npm install @shuriken/sdk
 ```
 
 ## Quick start
 
 ```typescript
-import { createShurikenClient } from '@shuriken-trade/sdk'
+import { createShurikenClient } from '@shuriken/sdk'
 
 const client = createShurikenClient({
   apiKey: process.env.SHURIKEN_API_KEY!,
