@@ -3,11 +3,10 @@ import PusherDefault from 'pusher-js'
 // pusher-js ships a CJS bundle; depending on the runtime the default import
 // may be the constructor directly, `{ default: Pusher }`, or `{ Pusher }`.
 const _mod = PusherDefault as unknown as Record<string, unknown>
-const Pusher = (
+const Pusher =
   typeof PusherDefault === 'function'
     ? PusherDefault
     : ((_mod.default ?? _mod.Pusher) as typeof PusherDefault)
-)
 type Pusher = InstanceType<typeof Pusher>
 
 import { ShurikenApiError, ShurikenAuthError, ShurikenSessionError } from './errors.js'
