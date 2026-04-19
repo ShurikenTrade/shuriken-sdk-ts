@@ -1,6 +1,6 @@
 {
   "name": "@shuriken/sdk-ts",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "TypeScript SDK for the Shuriken API (REST + WebSocket)",
   "type": "module",
   "main": "./dist/index.js",
