@@ -38,6 +38,7 @@ export type {
   AgentKeyConstraints,
   ChainPresets,
   DefaultWallets,
+  EnableMultisendResponse,
   EvmSwapPreset,
   OneClickModeSettings,
   SolanaSwapPreset,

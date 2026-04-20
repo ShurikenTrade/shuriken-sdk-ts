@@ -161,6 +161,14 @@ export interface AgentKeyConstraints {
   maxSellPositionPct: number | null
 }
 
+/** Response from enabling multisend (durable nonce) on a wallet. */
+export interface EnableMultisendResponse {
+  /** Task ID for tracking the nonce initialization. */
+  taskId: string
+  /** Human-readable status message. */
+  message: string
+}
+
 /** Agent key usage info and constraints. */
 export interface AccountUsage {
   /** Agent key ID. */
@@ -187,4 +195,6 @@ export interface AccountApi {
   getUsage(): Promise<AccountUsage>
   /** List all wallets on the account. */
   getWallets(): Promise<AccountWallet[]>
+  /** Enable multisend (durable nonce) on a Solana wallet. Returns a task ID for tracking. */
+  enableMultisend(walletId: string): Promise<EnableMultisendResponse>
 }

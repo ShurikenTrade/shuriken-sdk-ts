@@ -17,6 +17,7 @@ import type {
   AccountSettings,
   AccountUsage,
   AccountWallet,
+  EnableMultisendResponse,
 } from './api/account.js'
 import type {
   FundingPayment,
@@ -225,6 +226,11 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
     updateSettings: (settings) => apiPut<AccountSettings>('/api/v2/account/settings', settings),
     getUsage: () => apiGet<AccountUsage>('/api/v2/account/usage'),
     getWallets: () => apiGet<AccountWallet[]>('/api/v2/account/wallets'),
+    enableMultisend: (walletId) =>
+      apiPost<EnableMultisendResponse>(
+        `/api/v2/account/wallets/${encodeURIComponent(walletId)}/enable-multisend`,
+        {}
+      ),
   }
 
   // ─── Tokens ───────────────────────────────────────────────────────────

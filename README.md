@@ -142,6 +142,9 @@ const usage = await client.account.getUsage()
 // Trade settings
 const settings = await client.account.getSettings()
 await client.account.updateSettings(settings)
+
+// Enable multisend (durable nonce) on a Solana wallet
+const { taskId } = await client.account.enableMultisend('wallet-id')
 ```
 
 ## Trigger orders
