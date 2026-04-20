@@ -98,9 +98,14 @@ export interface SvmBondingCurveCreationEvent {
   tokenAddress: string
   curveAddress: string
   curveDexType: string
+  creator: string
+  signature: string
+  slot: number
+  blockTime: number
+  blockHeight: number
+  blockHash: string
+  transactionIndex?: number
   network: 'sol'
-  creationTimestamp?: number
-  blockIndex: number
 }
 
 // ── svm.bondingCurve.graduations ─────────────────────────────────────────────
@@ -109,11 +114,15 @@ export interface SvmBondingCurveGraduationEvent {
   tokenAddress: string
   curveAddress: string
   curveDexType: string
+  destPoolAddress: string
+  destPoolDexType: string
+  signature: string
+  slot: number
+  blockTime: number
+  blockHeight: number
+  blockHash: string
+  transactionIndex?: number
   network: 'sol'
-  graduationTimestamp?: number
-  destPoolAddress?: string
-  destPoolDexType?: string
-  blockIndex: number
 }
 
 // ── svm.token.distributionStats ──────────────────────────────────────────────
