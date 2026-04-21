@@ -1,8 +1,8 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // EVM stream payload types
 //
-// Each interface mirrors the JSON contract emitted by web-event-proxy on the
-// API-dedicated Soketi cluster for EVM-based events (Ethereum, Base, BSC, etc.).
+// Payload shapes for EVM-based events (Ethereum, Base, BSC, etc.) delivered
+// over the Shuriken WebSocket streams.
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── evm.token.swaps ──────────────────────────────────────────────────────────

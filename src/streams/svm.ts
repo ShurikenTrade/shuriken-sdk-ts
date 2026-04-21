@@ -1,8 +1,8 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // SVM (Solana) stream payload types
 //
-// Each interface mirrors the JSON contract emitted by web-event-proxy on the
-// API-dedicated Soketi cluster for Solana-based events.
+// Payload shapes for Solana-based events delivered over the Shuriken
+// WebSocket streams.
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ── svm.token.swaps ──────────────────────────────────────────────────────────
