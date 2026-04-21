@@ -4,19 +4,8 @@
 // Types shared across SVM, EVM, and alpha stream payloads.
 // ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * Network identifier matching the `NetworkId` proto enum.
- *
- * Serialised as a lowercase string over the wire by the API.
- */
+/** Supported network identifier, serialised as a lowercase string over the wire. */
 export type Network = 'eth' | 'base' | 'blast' | 'avax' | 'bsc' | 'trx' | 'sol' | 'monad' | 'hype'
-
-/**
- * Chat platform identifier.
- *
- * Matches the Rust `Platform` enum from `shuriken-api-types-rs`.
- */
-export type Platform = 'discord' | 'telegram' | 'x' | 'unknown'
 
 // ── Signal feed primitives ──────────────────────────────────────────────────
 

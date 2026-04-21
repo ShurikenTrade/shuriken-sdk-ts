@@ -193,7 +193,18 @@ export type {
   AlphaPlatform,
   AlphaProfileSignalFeedEvent,
   AlphaProfileSignalFeedFilter,
+} from './streams/index.js'
+
+// Stream types — Common
+export type {
+  DiscordSignalSource,
+  FeedTokenMeta,
+  FeedTokenSignal,
   Network,
+  SignalSource,
+  TelegramSignalSource,
+  TradeSignalSource,
+  XSignalSource,
 } from './streams/index.js'
 
 // Stream types — Portfolio / Automation notifications

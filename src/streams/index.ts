@@ -40,7 +40,16 @@ export type {
   AlphaProfileSignalFeedFilter,
 } from './alpha.js'
 
-export type { Network } from './common.js'
+export type {
+  DiscordSignalSource,
+  FeedTokenMeta,
+  FeedTokenSignal,
+  Network,
+  SignalSource,
+  TelegramSignalSource,
+  TradeSignalSource,
+  XSignalSource,
+} from './common.js'
 
 export type {
   ApprovalNotificationEvent,

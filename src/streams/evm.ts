@@ -40,6 +40,16 @@ export interface EvmSwapEvent {
 export interface EvmTokenPoolEvent {
   tokenAddress: string
   chainId: number
+  tokenName: string
+  tokenSymbol: string
+  tokenDecimals: number
+  totalSupply?: string
+  priceUsd?: string
+  priceNative?: string
+  liquidityUsd?: string
+  marketCapUsd?: string
+  blockNumber: number
+  timestampUpdatedMs: number
   network: Network
 }
 
