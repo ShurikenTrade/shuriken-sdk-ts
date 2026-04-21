@@ -23,6 +23,38 @@ export type {
   EvmWalletFilter,
 } from './evm.js'
 
+export type {
+  AlphaCallReferenceEvent,
+  AlphaCallReferenceMention,
+  AlphaChatMessage,
+  AlphaFeedMessageEvent,
+  AlphaGlobalSignalFeedEvent,
+  AlphaMessageAuthor,
+  AlphaMessageToken,
+  AlphaNamedSignalFeedEvent,
+  AlphaNamedSignalFeedFilter,
+  AlphaPersonalEvent,
+  AlphaPersonalSignalFeedEvent,
+  AlphaPlatform,
+  AlphaProfileSignalFeedEvent,
+  AlphaProfileSignalFeedFilter,
+} from './alpha.js'
+
+export type {
+  ApprovalNotificationEvent,
+  AutomationNotificationEvent,
+  AutomationUpdateEvent,
+  ClaimNotificationEvent,
+  CleanupNotificationEvent,
+  CrosschainSwapNotificationEvent,
+  PerpsOrderNotificationEvent,
+  PortfolioNotificationEvent,
+  StrategyNotificationEvent,
+  SvmNonceNotificationEvent,
+  SwapNotificationEvent,
+  TransferNotificationEvent,
+} from './portfolio.js'
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Stream ID → Payload type mapping
 // ─────────────────────────────────────────────────────────────────────────────
@@ -51,6 +83,18 @@ import type {
   EvmWalletFilter,
 } from './evm.js'
 
+import type {
+  AlphaGlobalSignalFeedEvent,
+  AlphaNamedSignalFeedEvent,
+  AlphaNamedSignalFeedFilter,
+  AlphaPersonalEvent,
+  AlphaPersonalSignalFeedEvent,
+  AlphaProfileSignalFeedEvent,
+  AlphaProfileSignalFeedFilter,
+} from './alpha.js'
+
+import type { AutomationUpdateEvent, PortfolioNotificationEvent } from './portfolio.js'
+
 export interface StreamPayloadMap {
   'svm.token.swaps': SvmSwapEvent
   'svm.token.poolInfo': SvmTokenPoolEvent
@@ -66,6 +110,13 @@ export interface StreamPayloadMap {
   'evm.wallet.nativeBalance': EvmNativeBalanceEvent
   'evm.wallet.tokenBalances': EvmWalletTokenBalanceEvent
   'evm.token.balances': EvmTokenBalanceEvent
+  'alpha.signalFeedGlobal': AlphaGlobalSignalFeedEvent
+  'alpha.signalFeedPersonal': AlphaPersonalSignalFeedEvent
+  'alpha.signalFeedProfile': AlphaProfileSignalFeedEvent
+  'alpha.signalFeedNamed': AlphaNamedSignalFeedEvent
+  'alpha.personal': AlphaPersonalEvent
+  'portfolio.notifications': PortfolioNotificationEvent
+  'automation.updates': AutomationUpdateEvent
 }
 
 export type StreamId = keyof StreamPayloadMap
@@ -89,4 +140,11 @@ export interface StreamFilterMap {
   'evm.wallet.nativeBalance': EvmWalletFilter
   'evm.wallet.tokenBalances': EvmWalletFilter
   'evm.token.balances': EvmTokenFilter
+  'alpha.signalFeedGlobal': Record<string, never>
+  'alpha.signalFeedPersonal': Record<string, never>
+  'alpha.signalFeedProfile': AlphaProfileSignalFeedFilter
+  'alpha.signalFeedNamed': AlphaNamedSignalFeedFilter
+  'alpha.personal': Record<string, never>
+  'portfolio.notifications': Record<string, never>
+  'automation.updates': Record<string, never>
 }

@@ -234,9 +234,16 @@ const funding = await client.perps.getFunding({ startTime: Date.now() - 86400000
 | `svm.bondingCurve.graduations` | — | Bonding curve graduations |
 | `evm.token.swaps` | `chainId`, `tokenAddress` | EVM token swap events |
 | `evm.token.poolInfo` | `chainId`, `tokenAddress` | EVM token/pool info updates |
-| `evm.token.balances` | `tokenAddress` | EVM token holder balance changes |
+| `evm.token.balances` | `chainId`, `tokenAddress` | EVM token holder balance changes |
 | `evm.wallet.nativeBalance` | `walletAddress` | Native balance changes (ETH/BNB) |
 | `evm.wallet.tokenBalances` | `walletAddress` | ERC-20 token balance changes |
+| `alpha.signalFeedGlobal` | — | Global signal feed updates (broadcast) |
+| `alpha.signalFeedPersonal` | — | Per-user personal signal feed updates |
+| `alpha.signalFeedProfile` | `profileId` | Per-profile signal feed updates |
+| `alpha.signalFeedNamed` | `feedId` | Named signal feed updates |
+| `alpha.personal` | — | Personal alpha channel (chat messages, call references, feed messages) |
+| `portfolio.notifications` | — | Per-user transaction & task lifecycle notifications |
+| `automation.updates` | — | Per-user automation / strategy lifecycle updates |
 
 ## Authentication
 
