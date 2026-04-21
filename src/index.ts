@@ -177,6 +177,52 @@ export type {
   EvmWalletTokenBalanceEvent,
 } from './streams/index.js'
 
+// Stream types — Alpha
+export type {
+  AlphaCallReferenceEvent,
+  AlphaCallReferenceMention,
+  AlphaChatMessage,
+  AlphaFeedMessageEvent,
+  AlphaGlobalSignalFeedEvent,
+  AlphaMessageAuthor,
+  AlphaMessageToken,
+  AlphaNamedSignalFeedEvent,
+  AlphaNamedSignalFeedFilter,
+  AlphaPersonalEvent,
+  AlphaPersonalSignalFeedEvent,
+  AlphaPlatform,
+  AlphaProfileSignalFeedEvent,
+  AlphaProfileSignalFeedFilter,
+} from './streams/index.js'
+
+// Stream types — Common
+export type {
+  DiscordSignalSource,
+  FeedTokenMeta,
+  FeedTokenSignal,
+  Network,
+  SignalSource,
+  TelegramSignalSource,
+  TradeSignalSource,
+  XSignalSource,
+} from './streams/index.js'
+
+// Stream types — Portfolio / Automation notifications
+export type {
+  ApprovalNotificationEvent,
+  AutomationNotificationEvent,
+  AutomationUpdateEvent,
+  ClaimNotificationEvent,
+  CleanupNotificationEvent,
+  CrosschainSwapNotificationEvent,
+  PerpsOrderNotificationEvent,
+  PortfolioNotificationEvent,
+  StrategyNotificationEvent,
+  SvmNonceNotificationEvent,
+  SwapNotificationEvent,
+  TransferNotificationEvent,
+} from './streams/index.js'
+
 // Stream maps
 export type {
   StreamFilterMap,
