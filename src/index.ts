@@ -193,6 +193,7 @@ export type {
   AlphaPlatform,
   AlphaProfileSignalFeedEvent,
   AlphaProfileSignalFeedFilter,
+  Network,
 } from './streams/index.js'
 
 // Stream types — Portfolio / Automation notifications

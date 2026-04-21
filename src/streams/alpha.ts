@@ -5,6 +5,8 @@
 // streams.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import type { Network } from './common.js'
+
 // ── Shared primitives ────────────────────────────────────────────────────────
 
 export type AlphaPlatform = 'discord' | 'telegram' | 'x' | 'unknown'
@@ -73,25 +75,25 @@ export type AlphaPersonalEvent = AlphaChatMessage | AlphaCallReferenceEvent | Al
 export interface AlphaGlobalSignalFeedEvent {
   type: 'globalSignalFeedUpdate'
   tokenAddress: string
-  network: string
+  network: Network
 }
 
 export interface AlphaPersonalSignalFeedEvent {
   type: 'personalSignalFeedUpdate'
   tokenAddress: string
-  network: string
+  network: Network
 }
 
 export interface AlphaNamedSignalFeedEvent {
   type: 'namedSignalFeedUpdate'
   tokenAddress: string
-  network: string
+  network: Network
 }
 
 export interface AlphaProfileSignalFeedEvent {
   type: 'profileSignalFeedUpdate'
   tokenAddress: string
-  network: string
+  network: Network
   profileId: string
 }
 

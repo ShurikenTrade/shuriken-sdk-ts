@@ -40,6 +40,8 @@ export type {
   AlphaProfileSignalFeedFilter,
 } from './alpha.js'
 
+export type { Network } from './common.js'
+
 export type {
   ApprovalNotificationEvent,
   AutomationNotificationEvent,

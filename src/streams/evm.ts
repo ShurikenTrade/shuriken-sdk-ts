@@ -5,6 +5,8 @@
 // over the Shuriken WebSocket streams.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import type { Network } from './common.js'
+
 // ── evm.token.swaps ──────────────────────────────────────────────────────────
 
 export interface EvmSwapEvent {
@@ -30,7 +32,7 @@ export interface EvmSwapEvent {
   maker?: string
   inferredDexType?: string
   platformName?: string
-  network: string
+  network: Network
 }
 
 // ── evm.token.poolInfo ───────────────────────────────────────────────────────
@@ -38,7 +40,7 @@ export interface EvmSwapEvent {
 export interface EvmTokenPoolEvent {
   tokenAddress: string
   chainId: number
-  network: string
+  network: Network
 }
 
 // ── evm.wallet.nativeBalance ─────────────────────────────────────────────────
@@ -49,7 +51,7 @@ export interface EvmNativeBalanceEvent {
   blockNumber: number
   blockTime: number
   balance: string
-  network: string
+  network: Network
 }
 
 // ── evm.wallet.tokenBalances ─────────────────────────────────────────────────
@@ -62,7 +64,7 @@ export interface EvmWalletTokenBalanceEvent {
   blockTime: number
   balance: string
   decimals: number
-  network: string
+  network: Network
 }
 
 // ── evm.token.balances ──────────────────────────────────────────────────────
@@ -75,7 +77,7 @@ export interface EvmTokenBalanceEvent {
   blockTime: number
   balance: string
   decimals: number
-  network: string
+  network: Network
 }
 
 // ── EVM filter shapes ────────────────────────────────────────────────────────
