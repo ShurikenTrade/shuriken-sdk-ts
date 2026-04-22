@@ -579,9 +579,12 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
     })
     if (sub.onError) {
       const onError = sub.onError
-      channel.bind('pusher:subscription_error', (err: { type?: string; error?: string; status?: number }) => {
-        onError({ status: err.status ?? 0, message: err.error ?? 'subscription failed' })
-      })
+      channel.bind(
+        'pusher:subscription_error',
+        (err: { type?: string; error?: string; status?: number }) => {
+          onError({ status: err.status ?? 0, message: err.error ?? 'subscription failed' })
+        }
+      )
     }
   }
 
