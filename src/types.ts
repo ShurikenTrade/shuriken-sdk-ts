@@ -129,6 +129,9 @@ export interface ConnectionStateEvent {
 /** Callback for WebSocket stream messages. */
 export type MessageHandler<T = unknown> = (payload: T) => void
 
+/** Callback for WebSocket subscription errors (e.g. channel auth failure). */
+export type SubscriptionErrorHandler = (error: { status: number; message: string }) => void
+
 /** Callback for WebSocket connection state changes. */
 export type ConnectionStateHandler = (event: ConnectionStateEvent) => void
 

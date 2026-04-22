@@ -73,6 +73,7 @@ import type {
   SessionResponse,
   ShurikenClientOptions,
   ShurikenSubscription,
+  SubscriptionErrorHandler,
   SubscriptionFilter,
 } from './types.js'
 
@@ -108,11 +109,13 @@ export interface ShurikenClient {
     subscribe<S extends StreamId>(
       stream: S,
       filter: StreamFilterMap[S],
-      handler: MessageHandler<StreamPayloadMap[S]>
+      handler: MessageHandler<StreamPayloadMap[S]>,
+      onError?: SubscriptionErrorHandler
     ): ShurikenSubscription
     subscribe<T = unknown>(
       filter: SubscriptionFilter,
-      handler: MessageHandler<T>
+      handler: MessageHandler<T>,
+      onError?: SubscriptionErrorHandler
     ): ShurikenSubscription
     onConnectionStateChange(handler: ConnectionStateHandler): () => void
     getSession(): SessionResponse | null
@@ -123,6 +126,7 @@ interface ActiveSubscription {
   channel: string
   event: string
   handler: MessageHandler
+  onError?: SubscriptionErrorHandler
   filter: SubscriptionFilter
   resolved: ResolvedSubscription | null
 }
@@ -573,6 +577,12 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
     channel.bind(sub.event, (data: unknown) => {
       sub.handler(data)
     })
+    if (sub.onError) {
+      const onError = sub.onError
+      channel.bind('pusher:subscription_error', (err: { type?: string; error?: string; status?: number }) => {
+        onError({ status: err.status ?? 0, message: err.error ?? 'subscription failed' })
+      })
+    }
   }
 
   function findResolved(filter: SubscriptionFilter): ResolvedSubscription | undefined {
@@ -642,16 +652,19 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
   function wsSubscribe(
     streamOrFilter: string | SubscriptionFilter,
     filterOrHandler: Record<string, string> | MessageHandler,
-    maybeHandler?: MessageHandler
+    maybeHandler?: MessageHandler | SubscriptionErrorHandler,
+    maybeOnError?: SubscriptionErrorHandler
   ): ShurikenSubscription {
-    const filter: SubscriptionFilter =
-      typeof streamOrFilter === 'string'
-        ? { stream: streamOrFilter, filter: filterOrHandler as Record<string, string> }
-        : streamOrFilter
-    const handler: MessageHandler =
-      typeof streamOrFilter === 'string'
-        ? (maybeHandler as MessageHandler)
-        : (filterOrHandler as MessageHandler)
+    const isTyped = typeof streamOrFilter === 'string'
+    const filter: SubscriptionFilter = isTyped
+      ? { stream: streamOrFilter, filter: filterOrHandler as Record<string, string> }
+      : streamOrFilter
+    const handler: MessageHandler = isTyped
+      ? (maybeHandler as MessageHandler)
+      : (filterOrHandler as MessageHandler)
+    const onError: SubscriptionErrorHandler | undefined = isTyped
+      ? maybeOnError
+      : (maybeHandler as SubscriptionErrorHandler | undefined)
 
     if (!transport || !session) {
       throw new ShurikenSessionError('Client is not connected. Call ws.connect() first.')
@@ -666,6 +679,7 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
         channel: resolved.channel,
         event: resolved.event,
         handler: handler as MessageHandler,
+        onError,
         filter,
         resolved,
       }
@@ -677,6 +691,7 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
         channel: '',
         event: '',
         handler: handler as MessageHandler,
+        onError,
         filter,
         resolved: null,
       }

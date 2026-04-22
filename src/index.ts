@@ -17,6 +17,7 @@ export type {
   StreamCatalogResponse,
   StreamEntry,
   StreamVisibility,
+  SubscriptionErrorHandler,
   SubscriptionFilter,
 } from './types.js'
 
