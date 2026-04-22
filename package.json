@@ -1,6 +1,6 @@
 {
   "name": "@shuriken/sdk-ts",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "TypeScript SDK for the Shuriken API (REST + WebSocket)",
   "type": "module",
   "main": "./dist/index.js",
@@ -11,9 +11,7 @@
       "import": "./dist/index.js"
     }
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit",

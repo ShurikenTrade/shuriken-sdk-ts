@@ -198,29 +198,6 @@ describe('swap', () => {
     })
   })
 
-  // ─── getStatus ────────────────────────────────────────────────────────
-
-  describe('getStatus', () => {
-    const status = {
-      taskId: 't_abc',
-      status: 'success',
-      txHash: '5xyz...',
-      errorCode: null,
-      errorMessage: null,
-    }
-
-    it('returns swap status by taskId', async () => {
-      fetchSpy = mockFetch(200, { data: status })
-      vi.stubGlobal('fetch', fetchSpy)
-
-      const result = await createClient().swap.getStatus('t_abc')
-      expect(result).toEqual(status)
-
-      const [url] = fetchSpy.mock.calls[0]
-      expect(url).toBe(`${BASE_URL}/api/v2/swap/status/t_abc`)
-    })
-  })
-
   // ─── getApproveSpender ────────────────────────────────────────────────
 
   describe('getApproveSpender', () => {

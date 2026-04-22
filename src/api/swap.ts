@@ -54,7 +54,7 @@ export interface SwapQuote {
 
 /** Execution status of a swap task. */
 export interface SwapStatus {
-  /** Task identifier (use with {@link SwapApi.getStatus}). */
+  /** Task identifier (use with {@link TasksApi.getStatus}). */
   taskId: string
   /** Current status. */
   status: 'submitted' | 'pending' | 'success' | 'failed'
@@ -236,8 +236,6 @@ export interface SwapApi {
   buildTransaction(params: BuildTransactionParams): Promise<BuildTransactionResponse>
   /** Submit a signed transaction for execution and monitoring. */
   submitTransaction(params: SubmitTransactionParams): Promise<SubmitTransactionResponse>
-  /** Poll the execution status of a swap task. */
-  getStatus(taskId: string): Promise<SwapStatus>
   /** Get the router contract address to approve for EVM swaps. */
   getApproveSpender(chainId: number): Promise<ApproveSpenderResponse>
   /** Check the current ERC-20 allowance for the swap router (EVM only). */

@@ -50,21 +50,22 @@ describe('errors', () => {
   })
 
   describe('ShurikenApiError', () => {
-    it('preserves status and requestId', () => {
-      const err = new ShurikenApiError('not found', 404, 'req_123')
+    it('preserves status, apiCode, and requestId', () => {
+      const err = new ShurikenApiError('not found', 404, 'NOT_FOUND', 'req_123')
       expect(err.code).toBe('API_ERROR')
       expect(err.name).toBe('ShurikenApiError')
       expect(err.status).toBe(404)
+      expect(err.apiCode).toBe('NOT_FOUND')
       expect(err.requestId).toBe('req_123')
     })
 
     it('requestId is optional', () => {
-      const err = new ShurikenApiError('error', 500)
+      const err = new ShurikenApiError('error', 500, 'INTERNAL_ERROR')
       expect(err.requestId).toBeUndefined()
     })
 
     it('is instanceof ShurikenError', () => {
-      expect(new ShurikenApiError('x', 500)).toBeInstanceOf(ShurikenError)
+      expect(new ShurikenApiError('x', 500, 'INTERNAL_ERROR')).toBeInstanceOf(ShurikenError)
     })
   })
 

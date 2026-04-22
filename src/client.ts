@@ -55,6 +55,7 @@ import type {
   SwapQuote,
   SwapStatus,
 } from './api/swap.js'
+import type { TasksApi, TaskStatus } from './api/tasks.js'
 import type {
   BatchTokensResponse,
   TokenChart,
@@ -98,6 +99,7 @@ export interface ShurikenClient {
   perps: PerpsApi
   portfolio: PortfolioApi
   swap: SwapApi
+  tasks: TasksApi
   tokens: TokensApi
   trigger: TriggerApi
   ws: {
@@ -146,45 +148,49 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
 
   // ─── JSON request helpers ───────────────────────────────────────────────
 
-  async function apiGet<T>(path: string): Promise<T> {
-    const res = await apiFetch(path)
+  async function handleResponse<T>(res: Response): Promise<T> {
     if (res.status === 401) throw new ShurikenAuthError('Unauthorized')
     if (!res.ok) {
       const text = await res.text().catch(() => '')
-      throw new ShurikenApiError(`${res.status}: ${text}`, res.status)
+      let apiCode = 'UNKNOWN'
+      let message = text
+      let requestId: string | undefined
+      try {
+        const json = JSON.parse(text)
+        if (json?.error?.code) apiCode = json.error.code
+        if (json?.error?.message) message = json.error.message
+        if (json?.requestId) requestId = json.requestId
+      } catch {
+        // not JSON, use raw text
+      }
+      throw new ShurikenApiError(message, res.status, apiCode, requestId)
     }
     const json = await res.json()
     return (json.data ?? json) as T
+  }
+
+  async function apiGet<T>(path: string): Promise<T> {
+    return handleResponse(await apiFetch(path))
   }
 
   async function apiPost<T>(path: string, body: unknown): Promise<T> {
-    const res = await apiFetch(path, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    })
-    if (res.status === 401) throw new ShurikenAuthError('Unauthorized')
-    if (!res.ok) {
-      const text = await res.text().catch(() => '')
-      throw new ShurikenApiError(`${res.status}: ${text}`, res.status)
-    }
-    const json = await res.json()
-    return (json.data ?? json) as T
+    return handleResponse(
+      await apiFetch(path, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+    )
   }
 
   async function apiPut<T>(path: string, body: unknown): Promise<T> {
-    const res = await apiFetch(path, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    })
-    if (res.status === 401) throw new ShurikenAuthError('Unauthorized')
-    if (!res.ok) {
-      const text = await res.text().catch(() => '')
-      throw new ShurikenApiError(`${res.status}: ${text}`, res.status)
-    }
-    const json = await res.json()
-    return (json.data ?? json) as T
+    return handleResponse(
+      await apiFetch(path, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+    )
   }
 
   async function apiDelete<T>(path: string, body?: unknown): Promise<T> {
@@ -193,29 +199,17 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
       init.headers = { 'Content-Type': 'application/json' }
       init.body = JSON.stringify(body)
     }
-    const res = await apiFetch(path, init)
-    if (res.status === 401) throw new ShurikenAuthError('Unauthorized')
-    if (!res.ok) {
-      const text = await res.text().catch(() => '')
-      throw new ShurikenApiError(`${res.status}: ${text}`, res.status)
-    }
-    const json = await res.json()
-    return (json.data ?? json) as T
+    return handleResponse(await apiFetch(path, init))
   }
 
   async function apiPatch<T>(path: string, body: unknown): Promise<T> {
-    const res = await apiFetch(path, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    })
-    if (res.status === 401) throw new ShurikenAuthError('Unauthorized')
-    if (!res.ok) {
-      const text = await res.text().catch(() => '')
-      throw new ShurikenApiError(`${res.status}: ${text}`, res.status)
-    }
-    const json = await res.json()
-    return (json.data ?? json) as T
+    return handleResponse(
+      await apiFetch(path, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+    )
   }
 
   // ─── Account ──────────────────────────────────────────────────────────
@@ -327,8 +321,6 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
     submitTransaction: (params) =>
       apiPost<SubmitTransactionResponse>('/api/v2/swap/submit', params),
 
-    getStatus: (taskId) => apiGet<SwapStatus>(`/api/v2/swap/status/${encodeURIComponent(taskId)}`),
-
     getApproveSpender: (chainId) => {
       const qs = buildQuery({ chainId })
       return apiGet<ApproveSpenderResponse>(`/api/v2/swap/approve/spender${qs}`)
@@ -342,6 +334,12 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
       })
       return apiGet<ApproveAllowanceResponse>(`/api/v2/swap/approve/allowance${qs}`)
     },
+  }
+
+  // ─── Tasks ──────────────────────────────────────────────────────────
+
+  const tasks: TasksApi = {
+    getStatus: (taskId) => apiGet<TaskStatus>(`/api/v2/tasks/${encodeURIComponent(taskId)}`),
   }
 
   // ─── Trigger ─────────────────────────────────────────────────────────
@@ -717,6 +715,7 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
     account,
     portfolio,
     swap,
+    tasks,
     perps,
     tokens,
     trigger,

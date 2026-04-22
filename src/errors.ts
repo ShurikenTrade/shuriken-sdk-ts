@@ -2,7 +2,7 @@
 export class ShurikenError extends Error {
   constructor(
     message: string,
-    /** Error code (e.g. `AUTH_ERROR`, `API_ERROR`). */
+    /** Error code. */
     public readonly code: string
   ) {
     super(message)
@@ -32,6 +32,8 @@ export class ShurikenApiError extends ShurikenError {
     message: string,
     /** HTTP status code. */
     public readonly status: number,
+    /** Structured error code from the API. */
+    public readonly apiCode: string,
     /** API request ID for support reference. */
     public readonly requestId?: string
   ) {

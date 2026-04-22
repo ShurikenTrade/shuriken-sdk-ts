@@ -98,6 +98,12 @@ export type {
   WalletBalance,
 } from './api/portfolio.js'
 
+// Tasks API types
+export type {
+  TasksApi,
+  TaskStatus,
+} from './api/tasks.js'
+
 // Swap API types
 export type {
   ApproveAllowanceResponse,
