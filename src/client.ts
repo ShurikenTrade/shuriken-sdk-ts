@@ -1,13 +1,13 @@
-import PusherDefault from 'pusher-js'
+import TransportDefault from 'pusher-js'
 
-// pusher-js ships a CJS bundle; depending on the runtime the default import
-// may be the constructor directly, `{ default: Pusher }`, or `{ Pusher }`.
-const _mod = PusherDefault as unknown as Record<string, unknown>
-const Pusher =
-  typeof PusherDefault === 'function'
-    ? PusherDefault
-    : ((_mod.default ?? _mod.Pusher) as typeof PusherDefault)
-type Pusher = InstanceType<typeof Pusher>
+// The real-time transport library ships a CJS bundle; depending on the runtime
+// the default import may be the constructor directly or wrapped in an object.
+const _mod = TransportDefault as unknown as Record<string, unknown>
+const Transport =
+  typeof TransportDefault === 'function'
+    ? TransportDefault
+    : ((_mod.default ?? _mod.Pusher) as typeof TransportDefault)
+type Transport = InstanceType<typeof Transport>
 
 import { ShurikenApiError, ShurikenAuthError, ShurikenSessionError } from './errors.js'
 import type { StreamFilterMap, StreamId, StreamPayloadMap } from './streams/index.js'
@@ -423,7 +423,7 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
 
   // ─── WebSocket internals ───────────────────────────────────────────────
 
-  let pusher: Pusher | null = null
+  let transport: Transport | null = null
   let session: SessionResponse | null = null
   let connectionState: ConnectionState = 'disconnected'
   const stateHandlers = new Set<ConnectionStateHandler>()
@@ -440,8 +440,8 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
     }
   }
 
-  function mapPusherState(pusherState: string): ConnectionState {
-    switch (pusherState) {
+  function mapTransportState(transportState: string): ConnectionState {
+    switch (transportState) {
       case 'connected':
         return 'connected'
       case 'connecting':
@@ -511,7 +511,7 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
 
   /**
    * Expand the session to include new filters while preserving existing
-   * Pusher channel bindings. Serialized via sessionMutex to prevent races.
+   * channel bindings. Serialized via sessionMutex to prevent races.
    */
   function expandSession(newFilters: SubscriptionFilter[]): Promise<void> {
     const work = async () => {
@@ -529,7 +529,7 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
           sub.channel = resolved.channel
           sub.event = resolved.event
           sub.resolved = resolved
-          subscribeToPusherChannel(sub)
+          subscribeToChannel(sub)
         }
       }
     }
@@ -538,8 +538,8 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
     return sessionMutex
   }
 
-  function initPusher(conn: SessionResponse['connection']): Pusher {
-    return new Pusher(conn.appKey, {
+  function initTransport(conn: SessionResponse['connection']): Transport {
+    return new Transport(conn.appKey, {
       wsHost: conn.wsHost,
       wsPort: conn.wsPort,
       forceTLS: conn.forceTls,
@@ -555,9 +555,9 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
     })
   }
 
-  function bindPusherEvents(p: Pusher) {
+  function bindTransportEvents(p: Transport) {
     p.connection.bind('state_change', (states: { previous: string; current: string }) => {
-      emitState(mapPusherState(states.current))
+      emitState(mapTransportState(states.current))
     })
 
     p.connection.bind('error', (err: unknown) => {
@@ -566,10 +566,10 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
     })
   }
 
-  function subscribeToPusherChannel(sub: ActiveSubscription) {
-    if (!pusher) return
+  function subscribeToChannel(sub: ActiveSubscription) {
+    if (!transport) return
 
-    const channel = pusher.subscribe(sub.channel)
+    const channel = transport.subscribe(sub.channel)
     channel.bind(sub.event, (data: unknown) => {
       sub.handler(data)
     })
@@ -583,7 +583,7 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
   // ─── WebSocket public API ──────────────────────────────────────────────
 
   async function wsConnect(): Promise<void> {
-    if (pusher) {
+    if (transport) {
       throw new ShurikenSessionError('Client is already connected')
     }
 
@@ -593,12 +593,12 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
     // Actual subscriptions are added via subscribe() which expands the session.
     session = await fetchSession([{ stream: 'alpha.signalFeedGlobal' }])
 
-    pusher = initPusher(session.connection)
-    bindPusherEvents(pusher)
+    transport = initTransport(session.connection)
+    bindTransportEvents(transport)
 
     await new Promise<void>((resolve, reject) => {
-      // biome-ignore lint/style/noNonNullAssertion: pusher is set above
-      const p = pusher!
+      // biome-ignore lint/style/noNonNullAssertion: transport is set above
+      const p = transport!
       const timeout = setTimeout(() => {
         reject(new ShurikenSessionError('Connection timed out'))
       }, 30_000)
@@ -624,15 +624,15 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
 
   function wsDisconnect(): void {
     for (const [id, sub] of activeSubscriptions) {
-      if (pusher && sub.channel) {
-        pusher.unsubscribe(sub.channel)
+      if (transport && sub.channel) {
+        transport.unsubscribe(sub.channel)
       }
       activeSubscriptions.delete(id)
     }
 
-    if (pusher) {
-      pusher.disconnect()
-      pusher = null
+    if (transport) {
+      transport.disconnect()
+      transport = null
     }
 
     session = null
@@ -653,7 +653,7 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
         ? (maybeHandler as MessageHandler)
         : (filterOrHandler as MessageHandler)
 
-    if (!pusher || !session) {
+    if (!transport || !session) {
       throw new ShurikenSessionError('Client is not connected. Call ws.connect() first.')
     }
 
@@ -670,7 +670,7 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
         resolved,
       }
       activeSubscriptions.set(id, sub)
-      subscribeToPusherChannel(sub)
+      subscribeToChannel(sub)
     } else {
       // Stream not in session — register as pending and expand session
       const pending: ActiveSubscription = {
@@ -691,8 +691,8 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
       unsubscribe() {
         activeSubscriptions.delete(id)
         const sub = activeSubscriptions.get(id)
-        if (pusher && sub?.channel) {
-          pusher.unsubscribe(sub.channel)
+        if (transport && sub?.channel) {
+          transport.unsubscribe(sub.channel)
         }
       },
     }

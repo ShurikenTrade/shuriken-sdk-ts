@@ -7,7 +7,7 @@ const API_KEY = 'sk_test_key'
 const mockSessionResponse = {
   data: {
     connection: {
-      provider: 'pusher',
+      provider: 'ws',
       appKey: 'test-app-key',
       wsHost: 'ws.test.shuriken.trade',
       wsPort: 443,
@@ -39,12 +39,12 @@ function mockFetch(status: number, body: unknown) {
   })
 }
 
-// Pusher mock state — shared between factory and tests
-let pusherConnectionHandlers: Record<string, ((...args: unknown[]) => void)[]> = {}
-let pusherDisconnectSpy = vi.fn()
+// Transport mock state — shared between factory and tests
+let transportConnectionHandlers: Record<string, ((...args: unknown[]) => void)[]> = {}
+let transportDisconnectSpy = vi.fn()
 
 vi.mock('pusher-js', () => {
-  class PusherMock {
+  class TransportMock {
     connection: {
       state: string
       bind: (event: string, handler: (...args: unknown[]) => void) => void
@@ -53,13 +53,13 @@ vi.mock('pusher-js', () => {
     unsubscribe: ReturnType<typeof vi.fn>
 
     constructor() {
-      pusherConnectionHandlers = {}
-      pusherDisconnectSpy = vi.fn()
+      transportConnectionHandlers = {}
+      transportDisconnectSpy = vi.fn()
       this.connection = {
         state: 'initialized',
         bind(event: string, handler: (...args: unknown[]) => void) {
-          if (!pusherConnectionHandlers[event]) pusherConnectionHandlers[event] = []
-          pusherConnectionHandlers[event].push(handler)
+          if (!transportConnectionHandlers[event]) transportConnectionHandlers[event] = []
+          transportConnectionHandlers[event].push(handler)
         },
       }
       this.subscribe = vi.fn().mockReturnValue({ bind: vi.fn() })
@@ -67,14 +67,14 @@ vi.mock('pusher-js', () => {
     }
 
     disconnect(...args: unknown[]) {
-      pusherDisconnectSpy(...args)
+      transportDisconnectSpy(...args)
     }
   }
-  return { default: PusherMock }
+  return { default: TransportMock }
 })
 
-function emitPusherEvent(event: string, ...args: unknown[]) {
-  for (const h of pusherConnectionHandlers[event] ?? []) h(...args)
+function emitTransportEvent(event: string, ...args: unknown[]) {
+  for (const h of transportConnectionHandlers[event] ?? []) h(...args)
 }
 
 async function connectClient() {
@@ -86,7 +86,7 @@ async function connectClient() {
 
   const connectPromise = client.ws.connect()
   await new Promise((r) => setTimeout(r, 0))
-  emitPusherEvent('connected')
+  emitTransportEvent('connected')
   await connectPromise
 
   return { client, fetchSpy, createShurikenClient }
@@ -158,11 +158,11 @@ describe('WebSocket', () => {
       expect(client.ws.getSession()).toBeNull()
     })
 
-    it('calls pusher.disconnect()', async () => {
+    it('calls transport.disconnect()', async () => {
       const { client } = await connectClient()
 
       client.ws.disconnect()
-      expect(pusherDisconnectSpy).toHaveBeenCalledOnce()
+      expect(transportDisconnectSpy).toHaveBeenCalledOnce()
     })
   })
 

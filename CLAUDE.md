@@ -19,6 +19,6 @@ Public SDK for the Shuriken API (REST + WebSocket streams).
 ## Code style
 
 - Single quotes, no semicolons, 2 space indent (enforced by biome)
-- Stream payload types mirror the JSON contract from `web-event-proxy` on the API Soketi cluster
+- Stream payload types mirror the JSON contract served by the backend event pipeline
 - Types in `src/streams/svm.ts` and `src/streams/evm.ts` must stay in sync with Rust types in `packages/shuriken-api-types-rs/src/`
 - Prefix naming: `Svm*` / `Evm*` for chain-specific types, `SvmWallet*` / `EvmWallet*` for wallet-domain types

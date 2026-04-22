@@ -60,9 +60,9 @@ export interface AlphaCallReferenceEvent {
 }
 
 /**
- * Union of payload shapes delivered on the personal alpha channel
- * (`presence-alpha-{userId}`). Discriminate by the `type` field —
- * raw chat messages do not carry a `type` field.
+ * Union of payload shapes delivered on the `alpha.personal` stream.
+ * Discriminate by the `type` field — raw chat messages do not carry
+ * a `type` field.
  */
 export type AlphaPersonalEvent = AlphaChatMessage | AlphaCallReferenceEvent
 
@@ -104,8 +104,8 @@ export interface AlphaProfileSignalFeedEvent {
 }
 
 /**
- * Real-time chat message routed to a named signal feed channel
- * (`presence-signal-feed-{userId}-{feedId}`).
+ * Real-time chat message routed to a named signal feed
+ * (`alpha.signalFeedNamed`).
  */
 export interface AlphaFeedMessageEvent {
   type: 'feedMessage'

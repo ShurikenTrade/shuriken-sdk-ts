@@ -69,8 +69,8 @@ export interface PerpsOrderNotificationEvent {
 }
 
 /**
- * Union of all notification payload shapes delivered on
- * `presence-notification_{userId}`. Discriminate by the `type` field.
+ * Union of all notification payload shapes delivered on the
+ * `portfolio.notifications` stream. Discriminate by the `type` field.
  */
 export type PortfolioNotificationEvent =
   | SwapNotificationEvent

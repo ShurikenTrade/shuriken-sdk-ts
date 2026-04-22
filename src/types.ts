@@ -26,7 +26,7 @@ export interface StreamEntry {
   visibility: StreamVisibility
   /** Accepted filter fields. */
   filters: FilterField[]
-  /** Pusher event name. */
+  /** Real-time transport event name. */
   event: string
   /** Payload encoding format. */
   payloadFormat: PayloadFormat
@@ -42,9 +42,9 @@ export interface StreamCatalogResponse {
 
 /** WebSocket connection parameters. */
 export interface ConnectionInfo {
-  /** Provider name (e.g. `pusher`). */
+  /** Real-time transport provider identifier. */
   provider: string
-  /** Pusher app key. */
+  /** Application key for the real-time transport. */
   appKey: string
   /** WebSocket host. */
   wsHost: string
@@ -52,7 +52,7 @@ export interface ConnectionInfo {
   wsPort: number
   /** Whether to force TLS. */
   forceTls: boolean
-  /** URL for Pusher channel authentication. */
+  /** URL for WebSocket channel authentication. */
   authEndpoint: string
 }
 
@@ -66,9 +66,9 @@ export interface SessionInfo {
 export interface ResolvedSubscription {
   /** Stream identifier. */
   stream: string
-  /** Pusher channel name. */
+  /** Real-time transport channel name. */
   channel: string
-  /** Pusher event name. */
+  /** Real-time transport event name. */
   event: string
   /** Stream visibility. */
   visibility: StreamVisibility
