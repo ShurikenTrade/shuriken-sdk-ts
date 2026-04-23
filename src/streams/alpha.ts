@@ -30,7 +30,7 @@ export interface AlphaChatMessage {
   guildId?: string
   platform: AlphaPlatform
   content: string
-  timestampMs: number
+  timestamp: number
   author?: AlphaMessageAuthor
   tokens: AlphaMessageToken[]
   isEdited: boolean
