@@ -16,6 +16,7 @@ export interface AlphaMessageAuthor {
   username?: string
   displayName?: string
   avatarUrl?: string
+  isBot?: boolean
 }
 
 export interface AlphaMessageToken {
