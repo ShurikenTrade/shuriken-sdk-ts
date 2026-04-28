@@ -157,6 +157,21 @@ export type {
   TriggerOrdersResponse,
 } from './api/trigger.js'
 
+// Wallet Groups API types
+export type {
+  AddWalletsToGroupParams,
+  CreateWalletGroupParams,
+  CreateWalletGroupWithWalletsParams,
+  DeleteWalletGroupResponse,
+  ListWalletGroupsParams,
+  MoveWalletParams,
+  RemoveWalletsFromGroupParams,
+  ReorderWalletsInGroupParams,
+  UpdateWalletGroupParams,
+  WalletGroupRecord,
+  WalletGroupsApi,
+} from './api/wallet-groups.js'
+
 // Stream types — SVM
 export type {
   SvmBondingCurveCreationEvent,

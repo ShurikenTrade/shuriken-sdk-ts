@@ -47,6 +47,11 @@ import type {
   WalletBalance,
 } from './api/portfolio.js'
 import type {
+  DeleteWalletGroupResponse,
+  WalletGroupRecord,
+  WalletGroupsApi,
+} from './api/wallet-groups.js'
+import type {
   ApproveAllowanceResponse,
   ApproveSpenderResponse,
   BuildTransactionResponse,
@@ -103,6 +108,7 @@ export interface ShurikenClient {
   tasks: TasksApi
   tokens: TokensApi
   trigger: TriggerApi
+  walletGroups: WalletGroupsApi
   ws: {
     connect(): Promise<void>
     disconnect(): void
@@ -237,6 +243,52 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
     const entries = Object.entries(params).filter(([, v]) => v !== undefined)
     if (entries.length === 0) return ''
     return `?${entries.map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`).join('&')}`
+  }
+
+  // ─── Wallet Groups ─────────────────────────────────────────────────────
+
+  const walletGroups: WalletGroupsApi = {
+    list: (params) => {
+      const qs = buildQuery({ chain: params?.chain })
+      return apiGet<{ groups: WalletGroupRecord[] }>(`/api/v2/wallet-groups${qs}`).then(
+        (data) => data.groups
+      )
+    },
+
+    get: (groupId) =>
+      apiGet<WalletGroupRecord>(`/api/v2/wallet-groups/${encodeURIComponent(groupId)}`),
+
+    create: (params) => apiPost<WalletGroupRecord>('/api/v2/wallet-groups', params),
+
+    createWithWallets: (params) =>
+      apiPost<WalletGroupRecord>('/api/v2/wallet-groups/with-wallets', params),
+
+    update: (groupId, params) =>
+      apiPatch<WalletGroupRecord>(`/api/v2/wallet-groups/${encodeURIComponent(groupId)}`, params),
+
+    delete: (groupId) =>
+      apiDelete<DeleteWalletGroupResponse>(`/api/v2/wallet-groups/${encodeURIComponent(groupId)}`),
+
+    addWallets: (groupId, params) =>
+      apiPost<WalletGroupRecord>(
+        `/api/v2/wallet-groups/${encodeURIComponent(groupId)}/wallets`,
+        params
+      ),
+
+    removeWallets: (groupId, params) =>
+      apiDelete<WalletGroupRecord>(
+        `/api/v2/wallet-groups/${encodeURIComponent(groupId)}/wallets`,
+        params
+      ),
+
+    reorderWallets: (groupId, params) =>
+      apiPut<WalletGroupRecord>(
+        `/api/v2/wallet-groups/${encodeURIComponent(groupId)}/wallets/order`,
+        params
+      ),
+
+    moveWallet: (walletId, params) =>
+      apiPost<WalletGroupRecord>(`/api/v2/wallets/${encodeURIComponent(walletId)}/move`, params),
   }
 
   const tokens: TokensApi = {
@@ -737,6 +789,7 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
     perps,
     tokens,
     trigger,
+    walletGroups,
     ws: {
       connect: wsConnect,
       disconnect: wsDisconnect,

@@ -67,7 +67,14 @@ export interface ChainPresets {
   p2: SwapPreset
 }
 
-/** A named group of wallets. */
+/**
+ * In-settings reference to a wallet group. This is the legacy shape carried
+ * inside `TradeSettings.walletGroups` and kept here for backwards compatibility.
+ *
+ * For first-class wallet-group CRUD use `client.walletGroups.*` and the
+ * {@link WalletGroupRecord} type from `./wallet-groups.js` — that is the
+ * canonical entity returned by the `/api/v2/wallet-groups/*` REST surface.
+ */
 export interface WalletGroup {
   /** Group ID. */
   id: string

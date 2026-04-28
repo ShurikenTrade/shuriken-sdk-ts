@@ -175,6 +175,49 @@ const detail = await client.trigger.get('order_id')
 await client.trigger.cancel('order_id')
 ```
 
+## Wallet groups
+
+```typescript
+// List groups (optional chain filter)
+const groups = await client.walletGroups.list()
+const svmGroups = await client.walletGroups.list({ chain: 'svm' })
+
+// Create empty / pre-populated
+const empty = await client.walletGroups.create({ name: 'treasury', chain: 'svm' })
+const seeded = await client.walletGroups.create({
+  name: 'snipers',
+  chain: 'svm',
+  walletIds: ['wallet_1', 'wallet_2'],
+})
+
+// Atomically generate N fresh wallets and a group containing them
+// (single transaction — no orphans on partial failure)
+const generated = await client.walletGroups.createWithWallets({
+  name: 'fresh-treasury',
+  chain: 'svm',
+  walletCount: 4,
+})
+
+// Membership management
+await client.walletGroups.addWallets(group.groupId, { walletIds: ['w3'] })
+await client.walletGroups.removeWallets(group.groupId, { walletIds: ['w3'] })
+await client.walletGroups.reorderWallets(group.groupId, {
+  walletIds: ['w2', 'w1'], // must equal current membership in new order
+})
+
+// Move a wallet into / between groups
+await client.walletGroups.moveWallet('wallet_1', { toGroupId: group.groupId })
+
+// Rename / delete
+await client.walletGroups.update(group.groupId, { name: 'renamed' })
+await client.walletGroups.delete(group.groupId) // idempotent
+```
+
+> **Scope:** each endpoint accepts either `read:wallets` / `write:wallets` or
+> the focused `manage:wallet-groups` scope. A treasury-management key with
+> only `manage:wallet-groups` can do full group CRUD without granting the
+> broader wallet-address read surface.
+
 ## Perps
 
 ```typescript
