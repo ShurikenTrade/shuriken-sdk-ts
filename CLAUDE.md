@@ -10,6 +10,10 @@ Public SDK for the Shuriken API (REST + WebSocket streams).
    - **major** (0.1.0 → 1.0.0): breaking changes (renamed types, removed streams, changed filters)
 2. **Update `README.md`** if the change affects the public API surface (new streams, new methods, changed filters, renamed types).
 
+## Releasing
+
+A version bump alone does not publish — pushing a `v*` git tag triggers a publish to npm. See [CONTRIBUTING.md](CONTRIBUTING.md) for the release procedure. **Never push a tag or run the `release:*` scripts unless the user explicitly asks to release.**
+
 ## Build & lint
 
 - Build: `npm run build`
