@@ -51,6 +51,12 @@ import type {
   WalletGroupRecord,
   WalletGroupsApi,
 } from './api/wallet-groups.js'
+import type { WalletsApi } from './api/wallets.js'
+import type { TransfersApi } from './api/transfers.js'
+import type { SplitsApi } from './api/splits.js'
+import { createWalletsApi } from './api/wallets.js'
+import { createTransfersApi } from './api/transfers.js'
+import { createSplitsApi } from './api/splits.js'
 import type {
   ApproveAllowanceResponse,
   ApproveSpenderResponse,
@@ -104,11 +110,14 @@ export interface ShurikenClient {
   account: AccountApi
   perps: PerpsApi
   portfolio: PortfolioApi
+  splits: SplitsApi
   swap: SwapApi
   tasks: TasksApi
   tokens: TokensApi
+  transfers: TransfersApi
   trigger: TriggerApi
   walletGroups: WalletGroupsApi
+  wallets: WalletsApi
   ws: {
     connect(): Promise<void>
     disconnect(): void
@@ -290,6 +299,18 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
     moveWallet: (walletId, params) =>
       apiPost<WalletGroupRecord>(`/api/v2/wallets/${encodeURIComponent(walletId)}/move`, params),
   }
+
+  // ─── Wallets ───────────────────────────────────────────────────────────
+
+  const wallets: WalletsApi = createWalletsApi(apiPost)
+
+  // ─── Transfers ─────────────────────────────────────────────────────────
+
+  const transfers: TransfersApi = createTransfersApi(apiPost)
+
+  // ─── Splits ────────────────────────────────────────────────────────────
+
+  const splits: SplitsApi = createSplitsApi(apiPost)
 
   const tokens: TokensApi = {
     get: (tokenId) => apiGet<TokenInfo>(`/api/v2/tokens/${encodeURIComponent(tokenId)}`),
@@ -784,12 +805,15 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
   return {
     account,
     portfolio,
+    splits,
     swap,
     tasks,
     perps,
     tokens,
+    transfers,
     trigger,
     walletGroups,
+    wallets,
     ws: {
       connect: wsConnect,
       disconnect: wsDisconnect,
