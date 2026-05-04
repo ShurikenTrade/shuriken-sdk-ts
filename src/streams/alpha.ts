@@ -9,8 +9,6 @@ import type { FeedTokenMeta, FeedTokenSignal, Network } from './common.js'
 
 // ── Shared primitives ────────────────────────────────────────────────────────
 
-export type AlphaPlatform = 'discord' | 'telegram' | 'x' | 'unknown'
-
 export interface AlphaMessageAuthor {
   userId?: string
   username?: string
@@ -24,22 +22,90 @@ export interface AlphaMessageToken {
   chain: string
 }
 
-/** Chat message ingested from Discord / Telegram / X. */
-export interface AlphaChatMessage {
+// ── Per-platform message variants ────────────────────────────────────────────
+
+export interface DiscordMessageEvent {
   messageId: string
+  guildId: string
   channelId: string
-  guildId?: string
-  platform: AlphaPlatform
+  /** Server name at ingest time. Frozen — does not track renames. */
+  snapshotGuildName?: string
+  /** Channel name at ingest time. Frozen — does not track renames. */
+  snapshotChannelName?: string
   content: string
   timestamp: number
   author?: AlphaMessageAuthor
   tokens: AlphaMessageToken[]
   isEdited: boolean
   isDeleted: boolean
-  isPinned: boolean
   replyToMessageId?: string
-  topicTitle?: string
 }
+
+export interface TelegramMessageEvent {
+  messageId: string
+  chatId: string
+  /** Chat title at ingest time. Frozen — does not track renames. */
+  snapshotChatTitle?: string
+  topicId?: number
+  /** Forum topic title (megagroups with forum=true). */
+  topicTitle?: string
+  content: string
+  timestamp: number
+  author?: AlphaMessageAuthor
+  tokens: AlphaMessageToken[]
+  isEdited: boolean
+  isDeleted: boolean
+  replyToMessageId?: string
+}
+
+export interface XAuthor {
+  userId: string
+  username: string
+  displayName?: string
+  avatarUrl?: string
+  verified: boolean
+  followersCount: number
+}
+
+export interface XMention {
+  username: string
+  userId: string
+}
+
+export interface XPublicMetrics {
+  likeCount: number
+  retweetCount: number
+  replyCount: number
+  quoteCount: number
+}
+
+export interface XMessageEvent {
+  tweetId: string
+  content: string
+  timestamp: number
+  author?: XAuthor
+  tokens: AlphaMessageToken[]
+  hashtags: string[]
+  cashtags: string[]
+  mentions: XMention[]
+  publicMetrics?: XPublicMetrics
+  conversationId?: string
+  inReplyToUserId?: string
+  mediaUrls: string[]
+  isDeleted: boolean
+}
+
+/**
+ * Platform-tagged chat / tweet event. Each variant carries only the fields
+ * meaningful to its platform — Discord callers don't see Telegram-only fields
+ * and vice versa.
+ *
+ * JSON wire shape: `{ "platform": "discord", "data": { ... } }`.
+ */
+export type MessageEvent =
+  | { platform: 'discord'; data: DiscordMessageEvent }
+  | { platform: 'telegram'; data: TelegramMessageEvent }
+  | { platform: 'x'; data: XMessageEvent }
 
 // ── alpha.personal ───────────────────────────────────────────────────────────
 
@@ -62,10 +128,10 @@ export interface AlphaCallReferenceEvent {
 
 /**
  * Union of payload shapes delivered on the `alpha.personal` stream.
- * Discriminate by the `type` field — raw chat messages do not carry
- * a `type` field.
+ * Discriminate by the `type` field — chat / tweet messages do not carry
+ * a `type` field; they're tagged via `platform`.
  */
-export type AlphaPersonalEvent = AlphaChatMessage | AlphaCallReferenceEvent
+export type AlphaPersonalEvent = MessageEvent | AlphaCallReferenceEvent
 
 // ── alpha.signalFeed* ────────────────────────────────────────────────────────
 
@@ -105,13 +171,13 @@ export interface AlphaProfileSignalFeedEvent {
 }
 
 /**
- * Real-time chat message routed to a named signal feed
+ * Real-time chat / tweet message routed to a named signal feed
  * (`alpha.signalFeedNamed`).
  */
 export interface AlphaFeedMessageEvent {
   type: 'feedMessage'
   feedId: string
-  message?: AlphaChatMessage
+  message?: MessageEvent
 }
 
 // ── Alpha filter shapes ──────────────────────────────────────────────────────

@@ -29,6 +29,10 @@ export interface DiscordSignalSource {
   authorIsBot?: boolean
   authorDisplayName?: string
   webhookId?: string
+  /** Server name at ingest time. Frozen — does not track renames. */
+  snapshotGuildName?: string
+  /** Channel name at ingest time. Frozen — does not track renames. */
+  snapshotChannelName?: string
 }
 
 export interface TelegramSignalSource {
@@ -41,6 +45,8 @@ export interface TelegramSignalSource {
   senderAvatarUrl?: string
   senderIsBot?: boolean
   senderDisplayName?: string
+  /** Chat title at ingest time. Frozen — does not track renames. */
+  snapshotChatTitle?: string
 }
 
 export interface XSignalSource {
