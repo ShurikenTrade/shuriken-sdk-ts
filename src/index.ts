@@ -235,7 +235,6 @@ export type {
 export type {
   AlphaCallReferenceEvent,
   AlphaCallReferenceMention,
-  AlphaChatMessage,
   AlphaFeedMessageEvent,
   AlphaGlobalSignalFeedEvent,
   AlphaMessageAuthor,
@@ -244,9 +243,15 @@ export type {
   AlphaNamedSignalFeedFilter,
   AlphaPersonalEvent,
   AlphaPersonalSignalFeedEvent,
-  AlphaPlatform,
   AlphaProfileSignalFeedEvent,
   AlphaProfileSignalFeedFilter,
+  DiscordMessageEvent,
+  MessageEvent,
+  TelegramMessageEvent,
+  XAuthor,
+  XMention,
+  XMessageEvent,
+  XPublicMetrics,
 } from './streams/index.js'
 
 // Stream types — Common
