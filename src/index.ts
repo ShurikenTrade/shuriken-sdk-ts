@@ -172,6 +172,38 @@ export type {
   WalletGroupsApi,
 } from './api/wallet-groups.js'
 
+// Wallets API types
+export type {
+  ArchiveWalletResponse,
+  BulkArchiveEntry,
+  BulkArchiveParams,
+  BulkArchiveResponse,
+  UnarchiveWalletResponse,
+  WalletRecord,
+  WalletsApi,
+} from './api/wallets.js'
+
+// Transfers API types
+export type {
+  RetireWalletParams,
+  SendParams,
+  TransferError,
+  TransferResult,
+  TransferTransaction,
+  TransfersApi,
+} from './api/transfers.js'
+
+// Splits API types
+export type {
+  ExecuteSplitBody,
+  ExecuteSplitResult,
+  PlanSplitBody,
+  PlanSplitDestination,
+  PlanSplitRate,
+  PlanSplitResult,
+  SplitsApi,
+} from './api/splits.js'
+
 // Stream types — SVM
 export type {
   SvmBondingCurveCreationEvent,

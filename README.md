@@ -218,6 +218,111 @@ await client.walletGroups.delete(group.groupId) // idempotent
 > only `manage:wallet-groups` can do full group CRUD without granting the
 > broader wallet-address read surface.
 
+## Wallet archive lifecycle
+
+Archive, unarchive, and bulk-archive wallets. Archived wallets are excluded
+from trading but their history is preserved. All endpoints require the
+`write:wallets` scope.
+
+```typescript
+// Archive a single wallet
+const { wallet, clearedDefault } = await client.wallets.archive('wallet-id')
+// clearedDefault is true if this wallet was the account default
+
+// Unarchive
+const { wallet: restored } = await client.wallets.unarchive('wallet-id')
+
+// Bulk-archive up to 100 wallets in one call
+const { results } = await client.wallets.bulkArchive({
+  walletIds: ['w1', 'w2', 'w3'],
+})
+for (const entry of results) {
+  console.log(entry.walletId, entry.status) // 'archived' | 'already_archived'
+}
+```
+
+## Wallet-to-wallet transfers
+
+Send tokens between wallets or retire (drain + archive) a source wallet.
+Both endpoints require the `transfer:write` scope.
+
+```typescript
+// Send SOL from one wallet to another (blocks until confirmed by default)
+const result = await client.transfers.send({
+  fromWalletId: 'w_from',
+  toWalletId: 'w_to',
+  token: 'SOL',
+  amount: '1000000', // raw base units (lamports)
+  chain: 'SVM',
+})
+console.log(result.status, result.transaction?.hash)
+
+// EVM transfer (chainId required for EVM)
+await client.transfers.send({
+  fromWalletId: 'w_evm_from',
+  toWalletId: 'w_evm_to',
+  token: 'USDC',
+  amount: '1000000', // 1 USDC (6 decimals)
+  chain: 'EVM',
+  chainId: 8453, // Base
+})
+
+// Fire-and-forget — get taskId immediately, poll for status
+const { taskId } = await client.transfers.send({
+  fromWalletId: 'w_from',
+  toWalletId: 'w_to',
+  token: 'SOL',
+  amount: '500000',
+  chain: 'SVM',
+  awaitResult: false,
+})
+const status = await client.tasks.getStatus(taskId)
+
+// Retire a wallet: drain full balance then archive the source
+const retire = await client.transfers.retireWallet({
+  fromWalletId: 'w_old',
+  toWalletId: 'w_new',
+  token: 'SOL',
+  chain: 'SVM',
+})
+// retire.willArchiveOnSuccess is always true
+```
+
+## SplitNOW splits
+
+Cross-chain split using SplitNOW. Two-step flow: plan then execute.
+Requires `split:plan` and `split:execute` scopes respectively.
+
+```typescript
+// Step 1: plan — quote a split and get a planId (valid 60 seconds)
+const plan = await client.splits.plan({
+  sourceWalletId: 'w_src',
+  destinationGroupId: 'grp_abc', // or pass destinations[] with pctBips
+  fromAmount: '0.16',
+  fromAsset: 'sol',
+})
+console.log(plan.summary)   // human-readable description — review before executing
+console.log(plan.warnings)  // non-fatal warnings (low liquidity, etc.)
+
+// Step 2: execute — submit within expiresInSeconds (60s)
+const { taskId, splitnowOrderId } = await client.splits.execute({
+  planId: plan.planId,
+  agentComment: 'weekly rebalance',
+})
+const status = await client.tasks.getStatus(taskId)
+
+// Alternatively, supply explicit destination weights instead of a group
+const explicitPlan = await client.splits.plan({
+  sourceWalletId: 'w_src',
+  destinations: [
+    { walletId: 'w1', pctBips: 6000 }, // 60 %
+    { walletId: 'w2', pctBips: 4000 }, // 40 %
+  ],
+  fromAmount: '1.0',
+  fromAsset: 'eth',
+})
+```
+
 ## Perps
 
 ```typescript
