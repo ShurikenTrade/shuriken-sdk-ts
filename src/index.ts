@@ -99,6 +99,20 @@ export type {
   WalletBalance,
 } from './api/portfolio.js'
 
+// Suggestions API types
+export type {
+  CreateSuggestionRequest,
+  ListSuggestionsQuery,
+  ListSuggestionsResponse,
+  SuggestionAgentKey,
+  SuggestionAsset,
+  SuggestionConfidence,
+  SuggestionSide,
+  SuggestionState,
+  SuggestionsApi,
+  TradeSuggestion,
+} from './api/suggestions.js'
+
 // Tasks API types
 export type {
   TasksApi,

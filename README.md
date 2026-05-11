@@ -218,6 +218,40 @@ await client.walletGroups.delete(group.groupId) // idempotent
 > only `manage:wallet-groups` can do full group CRUD without granting the
 > broader wallet-address read surface.
 
+## Trade suggestions
+
+Agents post advisory trade ideas to the user; the user acks (executes) or
+dismisses them from the terminal / tg-bot. Lifecycle states (`OPEN` | `ACTED` |
+`DISMISSED` | `EXPIRED`) are derived server-side from timestamps — clients
+should treat `state` as read-only.
+
+```typescript
+// Post a new suggestion (requires `write:suggestions` scope)
+const suggestion = await client.suggestions.create({
+  side: 'BUY',
+  networkId: 'SOL',
+  asset: 'So11111111111111111111111111111111111111112',
+  rationale: 'Funding flipped positive after a flush; reclaim of yesterdays range.',
+  amountInUsd: 250,
+  confidence: 'MEDIUM',
+})
+
+// List suggestions (defaults to OPEN; pass `state: 'ALL'` for everything)
+const { suggestions, nextCursor } = await client.suggestions.list({
+  state: 'OPEN',
+  limit: 50,
+})
+
+// Ack — mark as acted; optionally link the task ID that executed it
+await client.suggestions.ack(suggestion.id, 'task_abc')
+
+// Dismiss with an optional free-form reason
+await client.suggestions.dismiss(suggestion.id, 'too risky')
+```
+
+Both `ack` and `dismiss` return 409 `SUGGESTION_NOT_OPEN` if the suggestion is
+no longer in the `OPEN` state (already acted / dismissed / expired).
+
 ## Wallet archive lifecycle
 
 Archive, unarchive, and bulk-archive wallets. Archived wallets are excluded
