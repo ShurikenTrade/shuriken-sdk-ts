@@ -47,6 +47,13 @@ import type {
   WalletBalance,
 } from './api/portfolio.js'
 import type {
+  CreateSuggestionRequest,
+  ListSuggestionsQuery,
+  ListSuggestionsResponse,
+  SuggestionsApi,
+  TradeSuggestion,
+} from './api/suggestions.js'
+import type {
   DeleteWalletGroupResponse,
   WalletGroupRecord,
   WalletGroupsApi,
@@ -111,6 +118,7 @@ export interface ShurikenClient {
   perps: PerpsApi
   portfolio: PortfolioApi
   splits: SplitsApi
+  suggestions: SuggestionsApi
   swap: SwapApi
   tasks: TasksApi
   tokens: TokensApi
@@ -410,6 +418,22 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
         walletAddress: params.walletAddress,
       })
       return apiGet<ApproveAllowanceResponse>(`/api/v2/swap/approve/allowance${qs}`)
+    },
+  }
+
+  // ─── Suggestions ───────────────────────────────────────────────────
+
+  const suggestions: SuggestionsApi = {
+    create: (req: CreateSuggestionRequest) =>
+      apiPost<TradeSuggestion>('/api/v2/agents/suggestions', req),
+
+    list: (query?: ListSuggestionsQuery) => {
+      const qs = buildQuery({
+        state: query?.state,
+        limit: query?.limit,
+        cursor: query?.cursor,
+      })
+      return apiGet<ListSuggestionsResponse>(`/api/v2/agents/suggestions${qs}`)
     },
   }
 
@@ -806,6 +830,7 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
     account,
     portfolio,
     splits,
+    suggestions,
     swap,
     tasks,
     perps,
