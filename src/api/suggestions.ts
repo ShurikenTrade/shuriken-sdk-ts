@@ -40,8 +40,12 @@ export interface SuggestionAsset {
 }
 
 /**
- * Outbound suggestion shape returned by create / list / dismiss / ack.
+ * Outbound suggestion shape returned by create / list.
  * The `state` field is derived; the timestamps remain the source of truth.
+ *
+ * `actedAt` / `dismissedAt` / `dismissReason` / `linkedTaskId` are populated
+ * when the user acks or dismisses the suggestion from the terminal / tg-bot
+ * — agents observe the resolution via `list` but cannot drive it themselves.
  */
 export interface TradeSuggestion {
   /** Suggestion ID (cuid). */
@@ -112,19 +116,8 @@ export interface ListSuggestionsResponse {
 
 /** Agent-posted trade suggestions (`client.suggestions.*`). */
 export interface SuggestionsApi {
-  /** Post a new trade suggestion. Requires the `write:suggestions` scope. */
+  /** Post a new trade suggestion. Requires the `suggest:trade` scope. */
   create(req: CreateSuggestionRequest): Promise<TradeSuggestion>
   /** List suggestions for the authenticated user. */
   list(query?: ListSuggestionsQuery): Promise<ListSuggestionsResponse>
-  /**
-   * Dismiss an OPEN suggestion with an optional free-form reason.
-   * 409 SUGGESTION_NOT_OPEN if already acted / dismissed / expired.
-   */
-  dismiss(id: string, reason?: string): Promise<TradeSuggestion>
-  /**
-   * Ack (mark as acted) an OPEN suggestion. Optionally link a task ID to
-   * record which execution flow honored the suggestion.
-   * 409 SUGGESTION_NOT_OPEN if already acted / dismissed / expired.
-   */
-  ack(id: string, linkedTaskId?: string): Promise<TradeSuggestion>
 }

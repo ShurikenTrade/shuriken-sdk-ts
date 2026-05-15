@@ -435,24 +435,6 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
       })
       return apiGet<ListSuggestionsResponse>(`/api/v2/agents/suggestions${qs}`)
     },
-
-    dismiss: (id, reason) => {
-      const body: { reason?: string } = {}
-      if (reason !== undefined) body.reason = reason
-      return apiPost<TradeSuggestion>(
-        `/api/v2/agents/suggestions/${encodeURIComponent(id)}/dismiss`,
-        body
-      )
-    },
-
-    ack: (id, linkedTaskId) => {
-      const body: { linkedTaskId?: string } = {}
-      if (linkedTaskId !== undefined) body.linkedTaskId = linkedTaskId
-      return apiPost<TradeSuggestion>(
-        `/api/v2/agents/suggestions/${encodeURIComponent(id)}/ack`,
-        body
-      )
-    },
   }
 
   // ─── Tasks ──────────────────────────────────────────────────────────

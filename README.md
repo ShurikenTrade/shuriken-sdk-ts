@@ -221,12 +221,13 @@ await client.walletGroups.delete(group.groupId) // idempotent
 ## Trade suggestions
 
 Agents post advisory trade ideas to the user; the user acks (executes) or
-dismisses them from the terminal / tg-bot. Lifecycle states (`OPEN` | `ACTED` |
-`DISMISSED` | `EXPIRED`) are derived server-side from timestamps — clients
-should treat `state` as read-only.
+dismisses them from the terminal / tg-bot — those flows are session-only and
+not exposed on the SDK. Lifecycle states (`OPEN` | `ACTED` | `DISMISSED` |
+`EXPIRED`) are derived server-side from timestamps — clients should treat
+`state` as read-only.
 
 ```typescript
-// Post a new suggestion (requires `write:suggestions` scope)
+// Post a new suggestion (requires `suggest:trade` scope)
 const suggestion = await client.suggestions.create({
   side: 'BUY',
   networkId: 'SOL',
@@ -236,21 +237,14 @@ const suggestion = await client.suggestions.create({
   confidence: 'MEDIUM',
 })
 
-// List suggestions (defaults to OPEN; pass `state: 'ALL'` for everything)
+// List suggestions (defaults to OPEN; pass `state: 'ALL'` for everything).
+// The user's ack / dismiss decisions surface here as `state` plus the
+// `actedAt` / `dismissedAt` / `dismissReason` / `linkedTaskId` fields.
 const { suggestions, nextCursor } = await client.suggestions.list({
   state: 'OPEN',
   limit: 50,
 })
-
-// Ack — mark as acted; optionally link the task ID that executed it
-await client.suggestions.ack(suggestion.id, 'task_abc')
-
-// Dismiss with an optional free-form reason
-await client.suggestions.dismiss(suggestion.id, 'too risky')
 ```
-
-Both `ack` and `dismiss` return 409 `SUGGESTION_NOT_OPEN` if the suggestion is
-no longer in the `OPEN` state (already acted / dismissed / expired).
 
 ## Wallet archive lifecycle
 
