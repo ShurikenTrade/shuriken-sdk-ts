@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createShurikenClient } from '../client.js'
-import { ShurikenApiError } from '../errors.js'
 import type { TradeSuggestion } from './suggestions.js'
 
 const BASE_URL = 'https://api.test.shuriken.trade'
@@ -148,5 +147,4 @@ describe('suggestions', () => {
       expect(url).toBe(`${BASE_URL}/api/v2/agents/suggestions?state=ALL`)
     })
   })
-
 })
