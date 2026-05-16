@@ -218,6 +218,39 @@ await client.walletGroups.delete(group.groupId) // idempotent
 > only `manage:wallet-groups` can do full group CRUD without granting the
 > broader wallet-address read surface.
 
+## Alpha signals
+
+Query the alpha signal feed — your connected sources' recent calls, global
+X/Twitter calls, and per-token signal context with surrounding chat context.
+
+```typescript
+// List your connected alpha sources
+const { sources } = await client.alpha.getSources()
+
+// Recent calls from your source connections
+const { totalCount, calls } = await client.alpha.getRecentCalls({
+  limit: 20,
+  sourceName: 'my-discord-server',  // optional filter
+})
+
+// Global calls (public X/Twitter signals)
+const global = await client.alpha.getGlobalCalls({ platform: 'x', limit: 50 })
+
+// Full signal context for a specific token
+const ctx = await client.alpha.getCallContext(tokenAddress, {
+  limit: 50,
+  cursor: ctx.nextCursor,            // pagination
+  sourceFilter: ['discord', 'telegram'],  // CSV on the wire
+  includeBotSignals: false,
+  includeMessageContext: true,       // include surrounding chat messages
+})
+
+// Mention history for a token
+const mentions = await client.alpha.getTokenMentions(tokenAddress, { limit: 100 })
+```
+
+Requires the `read:alpha` scope on your agent key.
+
 ## Trade suggestions
 
 Agents post advisory trade ideas to the user; the user acks (executes) or
