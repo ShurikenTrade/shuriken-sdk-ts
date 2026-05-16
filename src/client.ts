@@ -59,6 +59,14 @@ import type {
   WalletGroupsApi,
 } from './api/wallet-groups.js'
 import type { WalletsApi } from './api/wallets.js'
+import type {
+  AlphaNamespace,
+  GetAlphaSourcesResult,
+  GetCallContextResult,
+  GetGlobalCallsResult,
+  GetRecentCallsResult,
+  GetTokenMentionsResult,
+} from './api/alpha.js'
 import type { TransfersApi } from './api/transfers.js'
 import type { SplitsApi } from './api/splits.js'
 import { createWalletsApi } from './api/wallets.js'
@@ -115,6 +123,7 @@ import type {
  */
 export interface ShurikenClient {
   account: AccountApi
+  alpha: AlphaNamespace
   perps: PerpsApi
   portfolio: PortfolioApi
   splits: SplitsApi
@@ -309,6 +318,51 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
   }
 
   // ─── Wallets ───────────────────────────────────────────────────────────
+
+  // ─── Alpha ─────────────────────────────────────────────────────────────
+
+  function buildBoolQuery(val: boolean | undefined): string | undefined {
+    return val === undefined ? undefined : val ? 'true' : 'false'
+  }
+
+  const alpha: AlphaNamespace = {
+    getSources: () => apiGet<GetAlphaSourcesResult>('/api/v2/alpha/sources'),
+
+    getRecentCalls: (params) => {
+      const qs = buildQuery({
+        limit: params?.limit,
+        sourceName: params?.sourceName,
+        connectionId: params?.connectionId,
+      })
+      return apiGet<GetRecentCallsResult>(`/api/v2/alpha/recent-calls${qs}`)
+    },
+
+    getGlobalCalls: (params) => {
+      const qs = buildQuery({ platform: params?.platform, limit: params?.limit })
+      return apiGet<GetGlobalCallsResult>(`/api/v2/alpha/global-calls${qs}`)
+    },
+
+    getCallContext: (tokenAddress, params) => {
+      const sourceFilterStr = params?.sourceFilter?.join(',')
+      const qs = buildQuery({
+        limit: params?.limit,
+        cursor: params?.cursor,
+        sourceFilter: sourceFilterStr,
+        includeBotSignals: buildBoolQuery(params?.includeBotSignals),
+        includeMessageContext: buildBoolQuery(params?.includeMessageContext),
+      })
+      return apiGet<GetCallContextResult>(
+        `/api/v2/alpha/tokens/${encodeURIComponent(tokenAddress)}/call-context${qs}`
+      )
+    },
+
+    getTokenMentions: (tokenAddress, params) => {
+      const qs = buildQuery({ limit: params?.limit })
+      return apiGet<GetTokenMentionsResult>(
+        `/api/v2/alpha/tokens/${encodeURIComponent(tokenAddress)}/mentions${qs}`
+      )
+    },
+  }
 
   const wallets: WalletsApi = createWalletsApi(apiPost)
 
@@ -828,6 +882,7 @@ export function createShurikenClient(options: ShurikenClientOptions): ShurikenCl
 
   return {
     account,
+    alpha,
     portfolio,
     splits,
     suggestions,

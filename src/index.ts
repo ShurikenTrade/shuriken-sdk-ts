@@ -218,6 +218,30 @@ export type {
   SplitsApi,
 } from './api/splits.js'
 
+// Alpha namespace API types
+export type {
+  AlphaCallCaller,
+  AlphaCallSignal,
+  AlphaCallSourceDetail,
+  AlphaNamespace,
+  AlphaSourceItem,
+  AlphaTradeData,
+  ContextMessage,
+  GetAlphaSourcesResult,
+  GetCallContextParams,
+  GetCallContextResult,
+  GetGlobalCallsParams,
+  GetGlobalCallsResult,
+  GetRecentCallsParams,
+  GetRecentCallsResult,
+  GetTokenMentionsParams,
+  GetTokenMentionsResult,
+  GlobalCallItem,
+  RecentCallItem,
+  RecentCallSource,
+  TokenMentionItem,
+} from './api/alpha.js'
+
 // Stream types — SVM
 export type {
   SvmBondingCurveCreationEvent,
